@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
+import Match from './Match'
 
 export default class Result extends BaseModel {
   @column({ isPrimary: true })
@@ -20,4 +21,7 @@ export default class Result extends BaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updated_at: DateTime
+
+  @belongsTo(() => Match)
+  public matches: BelongsTo<typeof Match>
 }

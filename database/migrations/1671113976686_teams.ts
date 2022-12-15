@@ -5,13 +5,18 @@ export default class extends BaseSchema {
 
   public async up () {
     this.schema.createTable(this.tableName, (table) => {
-      table.increments('id')
+      table.bigIncrements('id').primary()
+
+      table.string('name').notNullable().unique().index()
+      table.integer('group_id').unsigned().index()
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
        */
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })
+
+      table.foreign('group_id').references('groups.id').onDelete('RESTRICT').onUpdate('RESTRICT')
     })
   }
 
