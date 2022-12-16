@@ -31,3 +31,8 @@ Route.get('health', async ({ response }) => {
   return report.healthy ? response.ok(report) : response.badRequest(report)
 })
 
+Route.post('/teams', 'TeamsController.store')
+Route.post('/groups', 'GroupsController.store')
+Route.get('/groups', 'GroupsController.index')
+Route.put("groups/:id", "GroupsController.update");
+Route.delete('/groups/:id', 'GroupsController.destroy')
