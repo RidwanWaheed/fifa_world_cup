@@ -11,10 +11,10 @@ export default class Group extends BaseModel {
   public name: string
 
   @column.dateTime({ autoCreate: true })
-  public created_at: DateTime
+  public createdAt: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
-  public updated_at: DateTime
+  public updatedAt: DateTime
 
   @hasMany(() => Team)
   public teams: HasMany<typeof Team>
@@ -22,5 +22,3 @@ export default class Group extends BaseModel {
   @hasMany(() => Match)
   public matches: HasMany<typeof Match>
 }
-
-

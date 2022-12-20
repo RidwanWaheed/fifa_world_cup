@@ -31,8 +31,28 @@ Route.get('health', async ({ response }) => {
   return report.healthy ? response.ok(report) : response.badRequest(report)
 })
 
-Route.post('/teams', 'TeamsController.store')
 Route.post('/groups', 'GroupsController.store')
 Route.get('/groups', 'GroupsController.index')
-Route.put("groups/:id", "GroupsController.update");
+Route.get('groups/:id', 'GroupsController.show')
+Route.put('groups/:id', 'GroupsController.update')
 Route.delete('/groups/:id', 'GroupsController.destroy')
+
+Route.post('/teams', 'TeamsController.store')
+Route.get('/teams', 'TeamsController.index')
+Route.get('teams/:id', 'TeamsController.show')
+Route.put('teams/:id', 'TeamsController.update')
+Route.delete('/teams/:id', 'TeamsController.destroy')
+
+Route.post('/matches', 'MatchesController.store')
+Route.get('/matches', 'MatchesController.index')
+Route.get('matches/:id', 'MatchesController.show')
+Route.put('matches/:id', 'MatchesController.update')
+Route.delete('/matches/:id', 'MatchesController.destroy')
+
+Route.post('/results', 'ResultsController.store')
+Route.get('/results', 'ResultsController.index')
+Route.get('results/:id', 'ResultsController.show')
+Route.put('results/:id', 'ResultsController.update')
+Route.delete('/results/:id', 'ResultsController.destroy')
+
+Route.post('/matches/:id', 'TeamsMatchesController.store')

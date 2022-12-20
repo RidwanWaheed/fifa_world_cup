@@ -1,5 +1,12 @@
 import { DateTime } from 'luxon'
-import { BaseModel, belongsTo, BelongsTo, column, ManyToMany, manyToMany } from '@ioc:Adonis/Lucid/Orm'
+import {
+  BaseModel,
+  belongsTo,
+  BelongsTo,
+  column,
+  ManyToMany,
+  manyToMany,
+} from '@ioc:Adonis/Lucid/Orm'
 import Group from './Group'
 import Match from './Match'
 
@@ -11,17 +18,17 @@ export default class Team extends BaseModel {
   public name: string
 
   @column()
-  public group_id: number
+  public groupId: number
 
   @column.dateTime({ autoCreate: true })
-  public created_at: DateTime
+  public createdAt: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
-  public updated_at: DateTime
+  public updatedAt: DateTime
 
   @belongsTo(() => Group)
   public group: BelongsTo<typeof Group>
 
-  @manyToMany(() => Match, {pivotTable: 'team_matches'})
+  @manyToMany(() => Match, { pivotTable: 'team_matches', pivotTimestamps: true })
   public matches: ManyToMany<typeof Match>
 }

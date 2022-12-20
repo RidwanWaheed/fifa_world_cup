@@ -7,20 +7,19 @@ export default class Result extends BaseModel {
   public id: number
 
   @column()
-  public match_id: number
+  public matchId: number
 
   @column()
-  public home_score: number
+  public homeScore: number
 
   @column()
-  public away_score: number
-
+  public awayScore: number
 
   @column.dateTime({ autoCreate: true })
-  public created_at: DateTime
+  public createdAt: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
-  public updated_at: DateTime
+  public updatedAt: DateTime
 
   @belongsTo(() => Match)
   public matches: BelongsTo<typeof Match>
