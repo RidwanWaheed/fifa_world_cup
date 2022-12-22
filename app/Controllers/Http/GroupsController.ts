@@ -19,8 +19,11 @@ export default class GroupsController {
     return response.created({ message: 'Group has been created', data: group })
   }
 
-  public async index({ response }: HttpContextContract) {
-    const groups = await Group.query()
+  public async index({ response, request }: HttpContextContract) {
+    const querystring = request.qs()
+    const { page = 1, per_page: perPage = 20 } = querystring
+
+    const groups = await Group.query().paginate(page, perPage)
     return response.ok({ data: groups })
   }
 

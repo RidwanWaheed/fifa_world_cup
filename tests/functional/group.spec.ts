@@ -9,22 +9,21 @@ test.group('Groups', (group) => {
     return () => Database.rollbackGlobalTransaction()
   })
 
-  const randomNumber = faker.datatype.number({
-    min: 1,
-    max: 8,
-  })
-  console.log(randomNumber)
+  test('should return a list of groups', async ({ client }) => {
+    const groups = await GroupSeeder.createGroups()
 
-  test('should fail if groups are not returned', async ({ client }) => {
     const response = await client.get('/groups')
 
     response.assertStatus(200)
     response.assertBodyContains({
-      data: GroupSeeder.fetchGroups,
+      data: {
+        data: groups.map((group) => ({ name: group.name, id: group.id })),
+        meta: { total: groups.length },
+      },
     })
-  })
+  }).pin()
 
-  test('should fail if group is not returned', async ({ client }) => {
+  /*   test('should fail if group is not returned', async ({ client }) => {
     const response = await client.get(`/groups/${randomNumber}`)
 
     response.assertStatus(200)
@@ -45,5 +44,5 @@ test.group('Groups', (group) => {
     response.assertBodyContains({
       data: randomNumber,
     })
-  })
+  }) */
 })
