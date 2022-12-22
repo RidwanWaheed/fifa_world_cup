@@ -23,7 +23,7 @@ export default class TeamsController {
       groupId,
     })
 
-    return response.created(team)
+    return response.created({ data: team })
   }
 
   public async index({}: HttpContextContract) {
@@ -62,10 +62,18 @@ export default class TeamsController {
     return response.ok({ message: 'Team was edited', data: team })
   }
 
-  public async destroy({ response, params }: HttpContextContract) {
+  public async destroyaa({ response, params }: HttpContextContract) {
     const team = await Team.findOrFail(params.id)
     await team.delete()
 
     return response.ok({ message: 'Team was deleted', data: team.id })
+  }
+
+  public async destroy({ response, params }: HttpContextContract) {
+    const teams = await Team.all()
+
+    await teams.forEach((team) => team.delete())
+
+    return response.created({ message: 'Group was deleted', data: teams })
   }
 }

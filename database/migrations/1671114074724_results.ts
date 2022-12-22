@@ -3,11 +3,11 @@ import BaseSchema from '@ioc:Adonis/Lucid/Schema'
 export default class extends BaseSchema {
   protected tableName = 'results'
 
-  public async up () {
+  public async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.bigIncrements('id').primary().index()
 
-      table.bigInteger('match_id').unsigned().index()
+      table.bigInteger('match_id').unsigned().index().unique()
       table.integer('home_score').unsigned()
       table.integer('away_score').unsigned()
 
@@ -21,7 +21,7 @@ export default class extends BaseSchema {
     })
   }
 
-  public async down () {
+  public async down() {
     this.schema.dropTable(this.tableName)
   }
 }

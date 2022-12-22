@@ -19,9 +19,9 @@ export default class GroupsController {
     return response.created({ message: 'Group has been created', data: group })
   }
 
-  public async index({}: HttpContextContract) {
+  public async index({ response }: HttpContextContract) {
     const groups = await Group.query()
-    return groups
+    return response.ok({ data: groups })
   }
 
   public async show({ response, params }: HttpContextContract) {
@@ -57,6 +57,14 @@ export default class GroupsController {
     const group = await Group.findOrFail(params.id)
     await group.delete()
 
-    return response.created({ message: 'Group was deleted', data: group.id })
+    return response.ok({ message: 'Group was deleted', data: group.id })
+  }
+
+  public async destroyall({ response }: HttpContextContract) {
+    const groups = await Group.all()
+
+    await groups.forEach((group) => group.delete())
+
+    return response.created({ message: 'Group was deleted', data: groups })
   }
 }

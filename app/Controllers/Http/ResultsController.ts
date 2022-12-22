@@ -54,14 +54,14 @@ export default class ResultsController {
       schema: resultSchema,
     })
 
-    const result = await Result.find(params.id)
-    result?.merge({
+    const result = await Result.findOrFail(params.id)
+    result.merge({
       matchId,
       homeScore,
       awayScore,
     })
 
-    await result?.save()
+    await result.save()
 
     return response.created({ message: 'Result was edited', data: result })
   }
