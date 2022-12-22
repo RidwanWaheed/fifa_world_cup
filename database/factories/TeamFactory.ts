@@ -5,8 +5,8 @@ export default Factory.define(Team, async ({ faker }) => {
   return {
     name: faker.helpers.unique(faker.address.country),
     groupId: faker.datatype.number({
-      min: 24,
-      max: 31,
+      min: 1,
+      max: 8,
     }),
   }
 }).build()
