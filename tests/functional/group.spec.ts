@@ -2,47 +2,76 @@ import { test } from '@japa/runner'
 import { faker } from '@faker-js/faker'
 import Database from '@ioc:Adonis/Lucid/Database'
 import GroupSeeder from 'Database/seeders/Group'
+import Group from 'App/Models/Group'
 
 test.group('Groups', (group) => {
   group.each.setup(async () => {
     await Database.beginGlobalTransaction()
     return () => Database.rollbackGlobalTransaction()
   })
+  const groups = GroupSeeder.createGroups()
+
+  test('should save provided group', async ({ client }) => {
+    const random = faker.random.alpha({ casing: 'upper', bannedChars: [`${/[A-H]/g}`] })
+    const response = await client.post('/groups').json({
+      name: random,
+    })
+
+    const group = Group.findByOrFail('name', random)
+
+    response.assertStatus(201)
+    response.assertBodyContains({
+      data: { id: (await group).id, name: (await group).name },
+      message: 'Group has been created',
+    })
+  }).tags(['group', 'create_group'])
 
   test('should return a list of groups', async ({ client }) => {
-    const groups = await GroupSeeder.createGroups()
-
     const response = await client.get('/groups')
 
     response.assertStatus(200)
     response.assertBodyContains({
       data: {
-        data: groups.map((group) => ({ name: group.name, id: group.id })),
-        meta: { total: groups.length },
+        data: (await groups).map((group) => ({ name: group.name, id: group.id })),
+        meta: { total: (await groups).length },
       },
     })
-  }).pin()
+  }).tags(['group', 'get_groups'])
 
-  /*   test('should fail if group is not returned', async ({ client }) => {
-    const response = await client.get(`/groups/${randomNumber}`)
-
-    response.assertStatus(200)
-  })
-
-  test('should fail if group is not updated', async ({ client }) => {
-    const response = await client.put(`/groups/${randomNumber}`).json({
-      name: faker.random.alpha({ casing: 'upper', bannedChars: [`${/[A-H]/g}`] }),
-    })
-
-    response.assertStatus(201)
-  })
-
-  test('should fail if group is not deleted', async ({ client }) => {
-    const response = await client.delete(`/groups/${randomNumber}`)
+  test('should return a group', async ({ client }) => {
+    // await GroupSeeder.createGroups()
+    const group = Group.findOrFail(8)
+    const response = await client.get('/groups/8')
 
     response.assertStatus(200)
     response.assertBodyContains({
-      data: randomNumber,
+      data: { id: (await group).id, name: (await group).name },
     })
-  }) */
+  }).tags(['group', 'get_group'])
+
+  test('should update a group', async ({ client }) => {
+    // await GroupSeeder.createGroups()
+    const response = await client.put('/groups/5').json({
+      name: faker.random.alpha({ casing: 'upper', bannedChars: [`${/[A-H]/g}`] }),
+    })
+    const group = Group.findOrFail(5)
+
+    response.assertStatus(201)
+    response.assertBodyContains({
+      data: { id: (await group).id, name: (await group).name },
+      message: 'Group was edited',
+    })
+  }).tags(['group', 'update_group'])
+
+  test('should delete a group', async ({ client }) => {
+    // await GroupSeeder.createGroups()
+    const group = Group.findOrFail(7)
+    const response = await client.delete('/groups/7')
+
+    response.assertStatus(200)
+    response.assertBodyContains({
+      data: { id: (await group).id, name: (await group).name },
+      message: 'Group was deleted',
+    })
+  }).tags(['group', 'delete_group'])
 })

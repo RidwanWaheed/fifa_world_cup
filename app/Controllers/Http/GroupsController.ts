@@ -60,7 +60,7 @@ export default class GroupsController {
     const group = await Group.findOrFail(params.id)
     await group.delete()
 
-    return response.ok({ message: 'Group was deleted', data: group.id })
+    return response.ok({ message: 'Group was deleted', data: group })
   }
 
   public async destroyall({ response }: HttpContextContract) {
