@@ -7,7 +7,7 @@ export default Factory.define(Team, async ({ faker }) => {
     name: faker.helpers.unique(faker.address.country),
   }
 })
-  .relation('group', () => GroupFactory)
+  // .relation('group', () => GroupFactory)
   .build()
 
 // groupId: faker.datatype.number({
