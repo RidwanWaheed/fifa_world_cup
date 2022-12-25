@@ -8,7 +8,7 @@ export default class GroupSeeder extends BaseSeeder {
   }
 
   public static async createGroups() {
-    return GroupFactory.createMany(8)
+    return GroupFactory.with('teams', 4).createMany(8)
   }
 
   public static async fetchGroups() {

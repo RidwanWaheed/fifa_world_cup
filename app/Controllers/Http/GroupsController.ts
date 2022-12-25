@@ -53,7 +53,7 @@ export default class GroupsController {
 
     await group.save()
 
-    return response.created({ message: 'Group was edited', data: group })
+    return response.ok({ message: 'Group was edited', data: group })
   }
 
   public async destroy({ response, params }: HttpContextContract) {
