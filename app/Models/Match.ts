@@ -20,8 +20,8 @@ export default class Match extends BaseModel {
   @column()
   public groupId: number
 
-  @column()
-  public startTime: string | null
+  @column.dateTime()
+  public startTime: DateTime
 
   @column.dateTime()
   public matchDate: DateTime

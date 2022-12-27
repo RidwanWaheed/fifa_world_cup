@@ -12,7 +12,7 @@ export default class MatchesController {
         }),
       ]),
       matchDate: schema.date(),
-      startTime: schema.string.nullableAndOptional(),
+      startTime: schema.date(),
     })
 
     const { groupId, matchDate, startTime } = await request.validate({
@@ -25,12 +25,16 @@ export default class MatchesController {
       startTime,
     })
 
+    match.refresh()
+
     return response.created({ message: 'Match has been created', data: match })
   }
 
-  public async index({}: HttpContextContract) {
-    const matches = await Match.query().preload('result').preload('teams')
-    return matches
+  public async index({ response, request }: HttpContextContract) {
+    const querystring = request.qs()
+    const { page = 1, per_page: perPage = 20 } = querystring
+    const matches = await Match.query().paginate(page, perPage)
+    return response.ok({ data: matches })
   }
 
   public async show({ response, params }: HttpContextContract) {
@@ -51,7 +55,7 @@ export default class MatchesController {
         }),
       ]),
       matchDate: schema.date(),
-      startTime: schema.string.nullableAndOptional(),
+      startTime: schema.date(),
     })
 
     const { groupId, matchDate, startTime } = await request.validate({
@@ -67,7 +71,7 @@ export default class MatchesController {
 
     await match.save()
 
-    return response.created({ message: 'Match was edited', data: match })
+    return response.ok({ message: 'Match was edited', data: match })
   }
 
   public async destroy({ response, params }: HttpContextContract) {
