@@ -9,10 +9,8 @@ test.group('Groups', (group) => {
     await Database.beginGlobalTransaction()
     return () => Database.rollbackGlobalTransaction()
   })
-  const groups = GroupSeeder.createGroups()
 
   test('should save provided group', async ({ client }) => {
-    await groups
     const random = faker.random.alpha({ casing: 'upper', bannedChars: [`${/[A-H]/g}`] })
     const response = await client.post('/groups').json({
       name: random,
@@ -24,12 +22,9 @@ test.group('Groups', (group) => {
       data: { id: (await group).id, name: (await group).name },
       message: 'Group has been created',
     })
-  })
-    .tags(['group', 'create_group'])
-    .pin()
+  }).tags(['group', 'create_group'])
 
   test('should return a list of groups', async ({ client }) => {
-    await groups
     const response = await client.get('/groups')
     const groupss = await GroupSeeder.fetchGroups()
 
@@ -43,7 +38,6 @@ test.group('Groups', (group) => {
   }).tags(['group', 'get_groups'])
 
   test('should return a group', async ({ client }) => {
-    await groups
     const group = Group.findOrFail(8)
     const response = await client.get('/groups/8')
 
@@ -54,7 +48,6 @@ test.group('Groups', (group) => {
   }).tags(['group', 'get_group'])
 
   test('should update a group', async ({ client }) => {
-    await groups
     const response = await client.put('/groups/5').json({
       name: faker.random.alpha({ casing: 'upper', bannedChars: [`${/[A-H]/g}`] }),
     })
