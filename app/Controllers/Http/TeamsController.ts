@@ -71,7 +71,7 @@ export default class TeamsController {
     return response.ok({ message: 'Team was deleted', data: team.id })
   }
 
-  public async destroy({ response, params }: HttpContextContract) {
+  public async destroy({ response }: HttpContextContract) {
     const teams = await Team.all()
 
     await teams.forEach((team) => team.delete())

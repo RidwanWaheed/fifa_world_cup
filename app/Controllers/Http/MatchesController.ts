@@ -13,9 +13,10 @@ export default class MatchesController {
       ]),
       matchDate: schema.date(),
       startTime: schema.date(),
+      teams: schema.array().members(schema.number()),
     })
 
-    const { groupId, matchDate, startTime } = await request.validate({
+    const { groupId, matchDate, startTime, teams } = await request.validate({
       schema: matchSchema,
     })
 
@@ -25,7 +26,7 @@ export default class MatchesController {
       startTime,
     })
 
-    match.refresh()
+    await match.related('teams').attach(teams)
 
     return response.created({ message: 'Match has been created', data: match })
   }

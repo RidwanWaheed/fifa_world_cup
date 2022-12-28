@@ -28,9 +28,12 @@ export default class ResultsController {
     return response.created({ message: 'Result has been created', data: result })
   }
 
-  public async index({}: HttpContextContract) {
-    const results = await Result.query()
-    return results
+  public async index({ request, response }: HttpContextContract) {
+    const querystring = request.qs()
+    const { page = 1, per_page: perPage = 20 } = querystring
+
+    const results = await Result.query().paginate(page, perPage)
+    return response.ok({ data: results })
   }
 
   public async show({ response, params }: HttpContextContract) {
@@ -63,7 +66,7 @@ export default class ResultsController {
 
     await result.save()
 
-    return response.created({ message: 'Result was edited', data: result })
+    return response.ok({ message: 'Result was edited', data: result })
   }
 
   public async destroy({ response, params }: HttpContextContract) {

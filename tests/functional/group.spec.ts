@@ -3,8 +3,6 @@ import { faker } from '@faker-js/faker'
 import Database from '@ioc:Adonis/Lucid/Database'
 import GroupSeeder from 'Database/seeders/Group'
 import Group from 'App/Models/Group'
-import TeamSeeder from 'Database/seeders/Team'
-import Team from 'App/Models/Team'
 
 test.group('Groups', (group) => {
   group.each.setup(async () => {
@@ -26,7 +24,9 @@ test.group('Groups', (group) => {
       data: { id: (await group).id, name: (await group).name },
       message: 'Group has been created',
     })
-  }).tags(['group', 'create_group'])
+  })
+    .tags(['group', 'create_group'])
+    .pin()
 
   test('should return a list of groups', async ({ client }) => {
     await groups
