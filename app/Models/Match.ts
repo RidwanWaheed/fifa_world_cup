@@ -1,24 +1,21 @@
-import { DateTime } from 'luxon'
-import {
-  BaseModel,
-  BelongsTo,
-  belongsTo,
-  column,
-  HasOne,
-  hasOne,
-  ManyToMany,
-  manyToMany,
-} from '@ioc:Adonis/Lucid/Orm'
+import Team from './Team'
 import Group from './Group'
 import Result from './Result'
-import Team from './Team'
+import { DateTime } from 'luxon'
+import { BaseModel, BelongsTo, belongsTo, column, HasOne, hasOne } from '@ioc:Adonis/Lucid/Orm'
 
 export default class Match extends BaseModel {
   @column({ isPrimary: true })
-  public id: number
+  public id: string
 
   @column()
-  public groupId: number
+  public groupId: string
+
+  @column()
+  public team1: string
+
+  @column()
+  public team2: string
 
   @column.dateTime()
   public startTime: DateTime
@@ -38,6 +35,9 @@ export default class Match extends BaseModel {
   @hasOne(() => Result)
   public result: HasOne<typeof Result>
 
-  @manyToMany(() => Team, { pivotTable: 'team_matches', pivotTimestamps: true })
-  public teams: ManyToMany<typeof Team>
+  @belongsTo(() => Team, { foreignKey: 'team1' })
+  public teamOne: BelongsTo<typeof Team>
+
+  @belongsTo(() => Team, { foreignKey: 'team2' })
+  public teamTwo: BelongsTo<typeof Team>
 }

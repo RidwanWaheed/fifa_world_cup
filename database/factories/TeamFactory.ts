@@ -9,7 +9,8 @@ export default Factory.define(Team, async ({ faker }) => {
   }
 })
   .relation('group', () => GroupFactory)
-  .relation('matches', () => MatchFactory)
+  .relation('matchesOne', () => MatchFactory)
+  .relation('matchesTwo', () => MatchFactory)
   .build()
 
 // groupId: faker.datatype.number({
