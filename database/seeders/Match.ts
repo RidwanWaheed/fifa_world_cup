@@ -1,7 +1,5 @@
 import BaseSeeder from '@ioc:Adonis/Lucid/Seeder'
-import Group from 'App/Models/Group'
 import Match from 'App/Models/Match'
-import GroupFactory from 'Database/factories/GroupFactory'
 
 export default class MatchSeeder extends BaseSeeder {
   public async run() {

@@ -19,3 +19,19 @@ export default class TeamsMatchesController {
     return response.created({ ok: true })
   }
 }
+
+public async storeUserFunctions({ request, response, auth, requestedUser, bouncer }: HttpContextContract) {
+  const churchFunctionSchema = schema.create({
+    functions: schema.array().members(schema.number()),
+  })
+
+  const { functions } = await request.validate({
+    schema: churchFunctionSchema,
+  })
+
+  await bouncer.with('UsersPolicy').authorize('create', requestedUser)
+
+  await auth.user!.related('churchFunctions').attach(functions)
+
+  return response.created({ ok: true })
+}

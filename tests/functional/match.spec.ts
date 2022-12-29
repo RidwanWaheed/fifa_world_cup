@@ -22,13 +22,15 @@ test.group('Match', (group) => {
       groupId: 7,
     })
     const match = (await MatchSeeder.fetchMatches()).pop()
-    console.log(response.body())
+    console.log(teamss)
     response.assertStatus(201)
     response.assertBodyContains({
       data: { id: match?.id, group_id: match?.groupId },
       message: 'Match has been created',
     })
-  }).tags(['match', 'store_match'])
+  })
+    .tags(['match', 'store_match'])
+    .pin()
 
   test('should return a list of matches', async ({ client, assert }) => {
     const response = await client.get('/matches')
@@ -46,9 +48,7 @@ test.group('Match', (group) => {
         assert.isNotNull(match[key])
       })
     }
-  })
-    .tags(['match', 'get_matches'])
-    .pin()
+  }).tags(['match', 'get_matches'])
 
   test('should return a match', async ({ client }) => {
     const match = await Match.findOrFail(8)
