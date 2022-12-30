@@ -1,10 +1,10 @@
-import Database from '@ioc:Adonis/Lucid/Database'
 import { test } from '@japa/runner'
-import MatchSeeder from 'Database/seeders/Match'
-import { DateTime } from 'luxon'
-import { faker } from '@faker-js/faker'
 import Match from 'App/Models/Match'
-import Team from 'App/Models/Team'
+import { faker } from '@faker-js/faker'
+import Database from '@ioc:Adonis/Lucid/Database'
+import GroupFactory from 'Database/factories/GroupFactory'
+import MatchFactory from 'Database/factories/MatchFactory'
+import { createGroupTeamsMatches } from 'App/Helpers/TestHelper'
 
 test.group('Match', (group) => {
   group.each.setup(async () => {
@@ -12,65 +12,94 @@ test.group('Match', (group) => {
     return () => Database.rollbackGlobalTransaction()
   })
 
-  test('should save provided match', async ({ client }) => {
-    const teams = await Team.all()
-    const teamss = teams.map((team) => team.id)
+  test('should create a new match', async ({ client }) => {
+    // 1. Create a group with teams
+    const group = await GroupFactory.with('teams', 2).create()
+    const teams = group.teams.map((team) => team.id)
+
+    const matchAttributes = await MatchFactory.make()
+
     const response = await client.post('/matches').json({
-      teams: faker.helpers.arrayElements(teamss, 2),
-      startTime: DateTime.fromJSDate(faker.datatype.datetime()),
-      matchDate: DateTime.fromJSDate(faker.datatype.datetime()),
-      groupId: 7,
+      team_ids: teams,
+      start_time: matchAttributes.startTime,
+      match_date: matchAttributes.matchDate,
+      group_id: group.id,
     })
-    const match = (await MatchSeeder.fetchMatches()).pop()
-    console.log(teamss)
+
+    const createdMatch = response.body().data
+
     response.assertStatus(201)
     response.assertBodyContains({
-      data: { id: match?.id, group_id: match?.groupId },
-      message: 'Match has been created',
+      data: { id: createdMatch.id, group_id: createdMatch.group_id },
     })
-  })
-    .tags(['match', 'store_match'])
-    .pin()
+  }).tags(['match', 'store_match'])
 
-  test('should return a list of matches', async ({ client, assert }) => {
-    const response = await client.get('/matches')
-    const matches = await MatchSeeder.fetchMatches()
-    // console.log(matches)
+  test('should return a list of matches', async ({ client, assert, route }) => {
+    await createGroupTeamsMatches(assert)
 
-    const body = response.body()
+    const response = await client.get(route('/matches', [], { qs: { per_page: 50 } }))
+
     response.assertStatus(200)
 
-    assert.equal(body.data.meta.total, 16)
-
-    for (const match of body.data.data) {
-      ;['id', 'group_id', 'match_date', 'start_time'].forEach((key) => {
-        assert.isDefined(match[key])
-        assert.isNotNull(match[key])
-      })
-    }
+    assert.equal(response.body().data.meta.total, 48)
   }).tags(['match', 'get_matches'])
 
-  test('should return a match', async ({ client }) => {
-    const match = await Match.findOrFail(8)
-    const response = await client.get('/matches/8')
+  test('should return a match', async ({ client, assert }) => {
+    await createGroupTeamsMatches(assert)
+
+    const matchIds = (await Match.all()).map((match) => match.id)
+    const matchId = faker.helpers.arrayElement(matchIds)
+
+    const response = await client.get(`/matches/${matchId}`)
+
+    const returnedMatch = response.body().data
 
     response.assertStatus(200)
     response.assertBodyContains({
-      data: { id: match.id, group_id: match?.groupId },
+      data: { id: returnedMatch.id, group_id: returnedMatch.group_id },
     })
   }).tags(['match', 'get_match'])
 
-  test('should update a match', async ({ client }) => {
-    const response = await client.put('/matches/4').json({
-      startTime: DateTime.fromJSDate(faker.datatype.datetime()),
-      matchDate: DateTime.fromJSDate(faker.datatype.datetime()),
-      groupId: 5,
+  test('should update a match', async ({ client, assert }) => {
+    await createGroupTeamsMatches(assert)
+    const group = await GroupFactory.with('teams', 2).create()
+    const teams = group.teams.map((team) => team.id)
+
+    const matchIds = (await Match.all()).map((match) => match.id)
+    const matchId = faker.helpers.arrayElement(matchIds)
+
+    const matchAttributes = await MatchFactory.make()
+
+    const response = await client.put(`/matches/${matchId}`).json({
+      team_ids: teams,
+      start_time: matchAttributes.startTime,
+      match_date: matchAttributes.matchDate,
+      group_id: group.id,
     })
-    const match = await Match.findOrFail(4)
+
+    const updatedMatch = response.body().data
+
     response.assertStatus(200)
     response.assertBodyContains({
-      data: { id: match.id, group_id: match.groupId },
+      data: { id: updatedMatch.id, group_id: updatedMatch.group_id },
       message: 'Match was edited',
     })
   }).tags(['match', 'update_match'])
+
+  test('should delete a match', async ({ client, assert }) => {
+    await createGroupTeamsMatches(assert)
+
+    const matchIds = (await Match.all()).map((match) => match.id)
+    const matchId = faker.helpers.arrayElement(matchIds)
+
+    const response = await client.delete(`/matches/${matchId}`)
+
+    const deletedMatch = response.body().data
+
+    response.assertStatus(200)
+    response.assertBodyContains({
+      data: { id: deletedMatch.id, name: deletedMatch.name },
+      message: 'Match was deleted',
+    })
+  }).tags(['group', 'delete_group'])
 })
