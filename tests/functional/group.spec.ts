@@ -1,83 +1,94 @@
 import { test } from '@japa/runner'
 import { faker } from '@faker-js/faker'
 import Database from '@ioc:Adonis/Lucid/Database'
-import GroupSeeder from 'Database/seeders/Group'
 import Group from 'App/Models/Group'
+import GroupFactory from 'Database/factories/GroupFactory'
 
 test.group('Groups', (group) => {
   group.each.setup(async () => {
     await Database.beginGlobalTransaction()
     return () => Database.rollbackGlobalTransaction()
   })
-  const groups = GroupSeeder.createGroups()
 
-  test('should save provided group', async ({ client }) => {
-    await groups
-    const random = faker.random.alpha({ casing: 'upper', bannedChars: [`${/[A-H]/g}`] })
+  test('should create a new group', async ({ client }) => {
+    await GroupFactory.createMany(8)
+
     const response = await client.post('/groups').json({
-      name: random,
+      name: faker.random.words(2),
     })
 
-    const group = Group.findByOrFail('name', random)
+    const createdGroup = response.body().data
+
     response.assertStatus(201)
     response.assertBodyContains({
-      data: { id: (await group).id, name: (await group).name },
+      data: { id: createdGroup.id, name: createdGroup.name },
       message: 'Group has been created',
     })
-  })
-    .tags(['group', 'create_group'])
-    .pin()
+  }).tags(['group', 'create_group'])
 
   test('should return a list of groups', async ({ client }) => {
-    await groups
+    const groups = await GroupFactory.createMany(8)
+
     const response = await client.get('/groups')
-    const groupss = await GroupSeeder.fetchGroups()
 
     response.assertStatus(200)
     response.assertBodyContains({
       data: {
-        data: (await groupss).map((group) => ({ name: group.name, id: group.id })),
-        meta: { total: (await groupss).length },
+        data: groups.map((group) => ({ name: group.name, id: group.id })),
+        meta: { total: groups.length },
       },
     })
   }).tags(['group', 'get_groups'])
 
   test('should return a group', async ({ client }) => {
-    await groups
-    const group = Group.findOrFail(8)
-    const response = await client.get('/groups/8')
+    await GroupFactory.createMany(8)
+
+    const groupIds = (await Group.all()).map((group) => group.id)
+    const groupId = faker.helpers.arrayElement(groupIds)
+
+    const response = await client.get(`/groups/${groupId}`)
+
+    const returnedGroup = response.body().data
 
     response.assertStatus(200)
     response.assertBodyContains({
-      data: { id: (await group).id, name: (await group).name },
+      data: { id: returnedGroup.id, name: returnedGroup.name },
     })
   }).tags(['group', 'get_group'])
 
   test('should update a group', async ({ client }) => {
-    await groups
-    const response = await client.put('/groups/5').json({
-      name: faker.random.alpha({ casing: 'upper', bannedChars: [`${/[A-H]/g}`] }),
+    await GroupFactory.createMany(8)
+
+    const groupIds = (await Group.all()).map((group) => group.id)
+    const groupId = faker.helpers.arrayElement(groupIds)
+
+    const response = await client.put(`/groups/${groupId}`).json({
+      name: faker.random.words(2),
     })
-    const group = Group.findOrFail(5)
+
+    const updatedGroup = response.body().data
 
     response.assertStatus(200)
     response.assertBodyContains({
-      data: { id: (await group).id, name: (await group).name },
+      data: { id: updatedGroup.id, name: updatedGroup.name },
       message: 'Group was edited',
     })
   }).tags(['group', 'update_group'])
 
-  // test('should delete a group', async ({ client }) => {
-  //   await groups
-  //   const group = Group.findOrFail(7)
-  //   const response = await client.delete('/groups/7')
+  test('should delete a group', async ({ client }) => {
+    await GroupFactory.createMany(8)
 
-  //   response.assertStatus(200)
-  //   response.assertBodyContains({
-  //     data: { id: (await group).id, name: (await group).name },
-  //     message: 'Group was deleted',
-  //   })
-  // }).tags(['group', 'delete_group'])
+    const groupIds = (await Group.all()).map((group) => group.id)
+    const groupId = faker.helpers.arrayElement(groupIds)
 
-  //////////* TEAM TEST*//////////
+    const response = await client.delete(`/groups/${groupId}`)
+
+    const deletedGroup = response.body().data
+
+    response.assertStatus(200)
+    response.assertBodyContains({
+      data: { id: deletedGroup.id, name: deletedGroup.name },
+      message: 'Group was deleted',
+    })
+  }).tags(['group', 'delete_group'])
 })

@@ -30,10 +30,6 @@ export default class GroupsController {
   public async show({ response, params }: HttpContextContract) {
     const group = await Group.findOrFail(params.id)
 
-    await group.load('matches', (matchesQuery) => {
-      matchesQuery.preload('result').preload('teams')
-    })
-
     return response.ok({ data: group })
   }
 

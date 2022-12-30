@@ -5,8 +5,7 @@ import MatchFactory from './MatchFactory'
 
 export default Factory.define(group, ({ faker }) => {
   return {
-    name: faker.helpers.unique(faker.random.alpha),
-    // faker.random.alpha({ casing: 'upper', bannedChars: [`${/[I-Z]/g}`] }),
+    name: faker.random.words(2),
   }
 })
   .relation('teams', () => TeamFactory)

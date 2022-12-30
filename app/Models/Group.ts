@@ -5,7 +5,7 @@ import Match from './Match'
 
 export default class Group extends BaseModel {
   @column({ isPrimary: true })
-  public id: number
+  public id: string
 
   @column()
   public name: string
