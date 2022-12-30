@@ -88,8 +88,6 @@ test.group('Team', (group) => {
 
     const deletedTeam = response.body().data
 
-    console.log(deletedTeam)
-
     response.assertStatus(200)
     response.assertBodyContains({
       data: { id: deletedTeam.id, name: deletedTeam.name },

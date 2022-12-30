@@ -41,9 +41,9 @@ test.group('Groups', (group) => {
   }).tags(['group', 'get_groups'])
 
   test('should return a group', async ({ client }) => {
-    await GroupFactory.createMany(8)
+    const groups = await GroupFactory.createMany(8)
 
-    const groupIds = (await Group.all()).map((group) => group.id)
+    const groupIds = groups.map((group) => group.id)
     const groupId = faker.helpers.arrayElement(groupIds)
 
     const response = await client.get(`/groups/${groupId}`)

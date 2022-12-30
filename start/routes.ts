@@ -52,7 +52,7 @@ Route.delete('/matches/:id', 'MatchesController.destroy')
 Route.post('/results', 'ResultsController.store')
 Route.get('/results', 'ResultsController.index')
 Route.get('results/:id', 'ResultsController.show')
-Route.put('results/:id', 'ResultsController.update')
+Route.patch('results/:id', 'ResultsController.update')
 Route.delete('/results/:id', 'ResultsController.destroy')
 
 Route.post('/matches/:id', 'TeamsMatchesController.store')

@@ -43,23 +43,16 @@ export default class ResultsController {
 
   public async update({ response, request, params }: HttpContextContract) {
     const resultSchema = schema.create({
-      matchId: schema.number([
-        rules.exists({
-          table: 'matches',
-          column: 'id',
-        }),
-      ]),
       homeScore: schema.number(),
       awayScore: schema.number(),
     })
 
-    const { matchId, homeScore, awayScore } = await request.validate({
+    const { homeScore, awayScore } = await request.validate({
       schema: resultSchema,
     })
 
     const result = await Result.findOrFail(params.id)
     result.merge({
-      matchId,
       homeScore,
       awayScore,
     })
@@ -73,6 +66,6 @@ export default class ResultsController {
     const result = await Result.findOrFail(params.id)
     await result.delete()
 
-    return response.created({ message: 'Result was deleted', data: result.id })
+    return response.ok({ message: 'Result was deleted', data: result })
   }
 }
