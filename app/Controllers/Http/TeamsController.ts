@@ -6,7 +6,7 @@ export default class TeamsController {
   public async store({ request, response }: HttpContextContract) {
     const teamSchema = schema.create({
       name: schema.string([rules.trim(), rules.escape(), rules.maxLength(30)]),
-      groupId: schema.number([
+      group_id: schema.number([
         rules.exists({
           table: 'groups',
           column: 'id',
@@ -14,7 +14,7 @@ export default class TeamsController {
       ]),
     })
 
-    const { name, groupId } = await request.validate({
+    const { name: name, group_id: groupId } = await request.validate({
       schema: teamSchema,
     })
 
@@ -41,7 +41,7 @@ export default class TeamsController {
   public async update({ response, request, params }: HttpContextContract) {
     const teamSchema = schema.create({
       name: schema.string([rules.trim(), rules.escape(), rules.maxLength(30)]),
-      groupId: schema.number([
+      group_id: schema.number([
         rules.exists({
           table: 'groups',
           column: 'id',
@@ -49,7 +49,7 @@ export default class TeamsController {
       ]),
     })
 
-    const { name, groupId } = await request.validate({
+    const { name: name, group_id: groupId } = await request.validate({
       schema: teamSchema,
     })
 
@@ -64,18 +64,10 @@ export default class TeamsController {
     return response.ok({ message: 'Team was edited', data: team })
   }
 
-  public async destroyaa({ response, params }: HttpContextContract) {
+  public async destroy({ response, params }: HttpContextContract) {
     const team = await Team.findOrFail(params.id)
     await team.delete()
 
-    return response.ok({ message: 'Team was deleted', data: team.id })
-  }
-
-  public async destroy({ response }: HttpContextContract) {
-    const teams = await Team.all()
-
-    await teams.forEach((team) => team.delete())
-
-    return response.created({ message: 'Group was deleted', data: teams })
+    return response.ok({ message: 'Team was deleted', data: team })
   }
 }

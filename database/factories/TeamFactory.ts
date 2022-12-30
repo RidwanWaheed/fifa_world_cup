@@ -12,8 +12,3 @@ export default Factory.define(Team, async ({ faker }) => {
   .relation('matchesOne', () => MatchFactory)
   .relation('matchesTwo', () => MatchFactory)
   .build()
-
-// groupId: faker.datatype.number({
-//   min: 1,
-//   max: 8,
-// }),
