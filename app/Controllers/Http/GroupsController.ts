@@ -62,7 +62,7 @@ export default class GroupsController {
   public async destroyall({ response }: HttpContextContract) {
     const groups = await Group.all()
 
-    await groups.forEach((group) => group.delete())
+    await Promise.all(groups.map((group) => group.delete()))
 
     return response.created({ message: 'Group was deleted', data: groups })
   }

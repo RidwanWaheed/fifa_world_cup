@@ -26,10 +26,8 @@ export default class TeamsController {
     return response.created({ message: 'Team has been created', data: team })
   }
 
-  public async index({ response, request }: HttpContextContract) {
-    const querystring = request.qs()
-    const { page = 1, per_page: perPage = 33 } = querystring
-    const teams = await Team.query().paginate(page, perPage)
+  public async index({ response }: HttpContextContract) {
+    const teams = await Team.query().paginate(1, 50)
     return response.ok({ data: teams })
   }
 

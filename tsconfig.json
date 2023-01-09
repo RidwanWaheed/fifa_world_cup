@@ -8,7 +8,6 @@
     "rootDir": "./",
     "sourceMap": true,
     "paths": {
-    "experimentalDecorators": true,
       "App/*": ["./app/*"],
       "Config/*": ["./config/*"],
       "Contracts/*": ["./contracts/*"],
