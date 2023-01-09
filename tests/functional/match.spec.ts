@@ -12,6 +12,23 @@ test.group('Match', (group) => {
     return () => Database.rollbackGlobalTransaction()
   })
 
+  test('should return 422 error if `group_id` is not provided', async ({ client }) => {
+    // 1. Create a group with teams
+    const group = await GroupFactory.with('teams', 2).create()
+    const teams = group.teams.map((team) => team.id)
+
+    const matchAttributes = await MatchFactory.make()
+
+    const response = await client.post('/matches').json({
+      team_ids: teams,
+      start_time: matchAttributes.startTime,
+      match_date: matchAttributes.matchDate,
+      group_ids: group.id,
+    })
+
+    response.assertStatus(422)
+  }).tags(['match', 'store_match'])
+
   test('should create a new match', async ({ client }) => {
     // 1. Create a group with teams
     const group = await GroupFactory.with('teams', 2).create()
@@ -30,7 +47,12 @@ test.group('Match', (group) => {
 
     response.assertStatus(201)
     response.assertBodyContains({
-      data: { id: createdMatch.id, group_id: createdMatch.group_id },
+      data: {
+        id: createdMatch.id,
+        group_id: createdMatch.group_id,
+        team1: teams[0],
+        team2: teams[1],
+      },
     })
   }).tags(['match', 'store_match'])
 
@@ -42,6 +64,8 @@ test.group('Match', (group) => {
     response.assertStatus(200)
 
     assert.equal(response.body().data.meta.total, 48)
+
+    // Assert other properties of the response
   }).tags(['match', 'get_matches'])
 
   test('should return a match', async ({ client, assert }) => {
@@ -65,25 +89,28 @@ test.group('Match', (group) => {
     const group = await GroupFactory.with('teams', 2).create()
     const teams = group.teams.map((team) => team.id)
 
-    const matchIds = (await Match.all()).map((match) => match.id)
-    const matchId = faker.helpers.arrayElement(matchIds)
+    const matches = await Match.all()
+    const match = faker.helpers.arrayElement(matches)
 
     const matchAttributes = await MatchFactory.make()
 
-    const response = await client.put(`/matches/${matchId}`).json({
+    const response = await client.put(`/matches/${match.id}`).json({
       team_ids: teams,
       start_time: matchAttributes.startTime,
       match_date: matchAttributes.matchDate,
-      group_id: group.id,
     })
 
     const updatedMatch = response.body().data
 
+    console.log(response.error())
+
     response.assertStatus(200)
     response.assertBodyContains({
-      data: { id: updatedMatch.id, group_id: updatedMatch.group_id },
+      data: { id: match.id, group_id: match.groupId },
       message: 'Match was edited',
     })
+
+    // Assert the edited `start_time` and `match_date`
   }).tags(['match', 'update_match'])
 
   test('should delete a match', async ({ client, assert }) => {
@@ -101,5 +128,7 @@ test.group('Match', (group) => {
       data: { id: deletedMatch.id, name: deletedMatch.name },
       message: 'Match was deleted',
     })
+
+    // Assert that match does not exist
   }).tags(['group', 'delete_group'])
 })

@@ -1,12 +1,14 @@
+import { Assert } from '@japa/assert'
 import GroupFactory from 'Database/factories/GroupFactory'
 import MatchFactory from 'Database/factories/MatchFactory'
 
-export async function createGroupTeamsMatches(assert) {
+export async function createGroupTeamsMatches(assert?: Assert) {
   const groups = await GroupFactory.with('teams', 4).createMany(8)
 
   for (const group of groups) {
     const teams = group.teams
-    assert.equal(teams.length, 4)
+
+    assert?.equal(teams.length, 4)
 
     const tracker: string[] = []
 

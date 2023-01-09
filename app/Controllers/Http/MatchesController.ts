@@ -41,6 +41,7 @@ export default class MatchesController {
 
     const teams = await Promise.all(teamIds.map((id) => Team.findOrFail(id)))
 
+    // Remove these two lines. Provide teams in the `create` method above
     await match.related('teamOne').associate(teams[0])
     await match.related('teamTwo').associate(teams[1])
 
@@ -55,27 +56,22 @@ export default class MatchesController {
   }
 
   public async show({ response, params }: HttpContextContract) {
-    const match = await Match.findOrFail(params.id)
-
-    await match.load('result')
-    await match.load('teamOne')
-    await match.load('teamTwo')
+    const match = await Match.query()
+      .preload('result')
+      .preload('teamOne')
+      .preload('teamTwo')
+      .where('id', params.id)
+      .firstOrFail()
 
     return response.ok({ data: match })
   }
 
   public async update({ response, request, params }: HttpContextContract) {
     const matchSchema = schema.create({
-      group_id: schema.number([
-        rules.exists({
-          table: 'groups',
-          column: 'id',
-        }),
-      ]),
       match_date: schema.date(),
       start_time: schema.date(),
       team_ids: schema.array().members(
-        schema.number([
+        schema.string([
           rules.exists({
             table: 'teams',
             column: 'id',
@@ -85,7 +81,6 @@ export default class MatchesController {
     })
 
     const {
-      group_id: groupId,
       match_date: matchDate,
       start_time: startTime,
       team_ids: teamIds,
@@ -94,16 +89,13 @@ export default class MatchesController {
     })
 
     const match = await Match.findOrFail(params.id)
+
     match.merge({
-      groupId,
       matchDate,
       startTime,
+      team1: teamIds[0],
+      team2: teamIds[1],
     })
-
-    const teams = await Promise.all(teamIds.map((id) => Team.findOrFail(id)))
-
-    await match.related('teamOne').associate(teams[0])
-    await match.related('teamTwo').associate(teams[1])
 
     await match.save()
 
