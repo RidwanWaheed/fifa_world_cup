@@ -4,18 +4,19 @@ import Group from 'App/Models/Group'
 
 export default class GroupsController {
   public async store({ request, response }: HttpContextContract) {
+    // 1. Create schema validation
     const groupSchema = schema.create({
       name: schema.string([rules.trim(), rules.escape(), rules.maxLength(30)]),
     })
-
+    // 2. Validate incoming data
     const { name } = await request.validate({
       schema: groupSchema,
     })
-
+    //. 3. create and persist data into the database
     const group = await Group.create({
       name,
     })
-
+    // 4. return a response with a message and group data created
     return response.created({ message: 'Group has been created', data: group })
   }
 
