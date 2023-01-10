@@ -5,6 +5,7 @@ import Database from '@ioc:Adonis/Lucid/Database'
 import GroupFactory from 'Database/factories/GroupFactory'
 import MatchFactory from 'Database/factories/MatchFactory'
 import { createGroupTeamsMatches } from 'App/Helpers/TestHelper'
+import { assert } from '@japa/preset-adonis'
 
 test.group('Match', (group) => {
   group.each.setup(async () => {
@@ -29,11 +30,32 @@ test.group('Match', (group) => {
     response.assertStatus(422)
   }).tags(['match', 'store_match'])
 
-  test('should create a new match', async ({ client }) => {
+  test('should return 400 error if `teams` does not belong got the same group', async ({
+    client,
+  }) => {
+    // 1. Create a group with teams
+    const groups = await GroupFactory.with('teams', 2).createMany(2)
+    const teams = groups.map((group) => group.teams.map((team) => team.id))
+    const group = groups.map((group) => group.id)
+
+    const matchAttributes = await MatchFactory.make()
+
+    const response = await client.post('/matches').json({
+      team_ids: [teams[0][0], teams[1][1]],
+      start_time: matchAttributes.startTime,
+      match_date: matchAttributes.matchDate,
+      group_id: group[0],
+    })
+    response.assertStatus(400)
+  })
+    .tags(['match', 'store_match'])
+    .pin()
+
+  test('should create a new match', async ({ client, assert }) => {
     // 1. Create a group with teams
     const group = await GroupFactory.with('teams', 2).create()
     const teams = group.teams.map((team) => team.id)
-
+    assert.equal(teams.length, 2)
     const matchAttributes = await MatchFactory.make()
 
     const response = await client.post('/matches').json({
@@ -44,6 +66,8 @@ test.group('Match', (group) => {
     })
 
     const createdMatch = response.body().data
+
+    console.log(response.body())
 
     response.assertStatus(201)
     response.assertBodyContains({
@@ -99,10 +123,6 @@ test.group('Match', (group) => {
       start_time: matchAttributes.startTime,
       match_date: matchAttributes.matchDate,
     })
-
-    const updatedMatch = response.body().data
-
-    console.log(response.error())
 
     response.assertStatus(200)
     response.assertBodyContains({

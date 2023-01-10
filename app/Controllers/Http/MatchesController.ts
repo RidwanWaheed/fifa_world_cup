@@ -32,18 +32,26 @@ export default class MatchesController {
     } = await request.validate({
       schema: matchSchema,
     })
+    //  check if both teams belong to the same group
+    // 1. fetch both teams
+    const teams = await Promise.all(
+      teamIds.map((teamId) => Team.query().where('id', teamId).firstOrFail())
+    )
+    // 2. fetch their groupIds
+    const groupid = teams.map((team) => team.groupId)
+
+    //persist data if both teams belong to the same group
+
+    if (groupid[0] !== groupid[1])
+      return response.badRequest({ message: 'Teams does not belong to the same group' })
 
     const match = await Match.create({
       groupId,
       matchDate,
       startTime,
+      team1: teamIds[0],
+      team2: teamIds[1],
     })
-
-    const teams = await Promise.all(teamIds.map((id) => Team.findOrFail(id)))
-
-    // Remove these two lines. Provide teams in the `create` method above
-    await match.related('teamOne').associate(teams[0])
-    await match.related('teamTwo').associate(teams[1])
 
     return response.created({ message: 'Match has been created', data: match })
   }
@@ -71,7 +79,7 @@ export default class MatchesController {
       match_date: schema.date(),
       start_time: schema.date(),
       team_ids: schema.array().members(
-        schema.string([
+        schema.number([
           rules.exists({
             table: 'teams',
             column: 'id',
@@ -105,7 +113,8 @@ export default class MatchesController {
   public async destroy({ response, params }: HttpContextContract) {
     const match = await Match.findOrFail(params.id)
     await match.delete()
+    const deletedMatch = await Match.find(params.id)
 
-    return response.ok({ message: 'Match was deleted', data: match })
+    if (!deletedMatch) return response.ok({ message: 'Match was deleted', data: match })
   }
 }
