@@ -47,9 +47,7 @@ test.group('Match', (group) => {
       group_id: group[0],
     })
     response.assertStatus(400)
-  })
-    .tags(['match', 'store_match'])
-    .pin()
+  }).tags(['match', 'store_match'])
 
   test('should create a new match', async ({ client, assert }) => {
     // 1. Create a group with teams
@@ -66,8 +64,6 @@ test.group('Match', (group) => {
     })
 
     const createdMatch = response.body().data
-
-    console.log(response.body())
 
     response.assertStatus(201)
     response.assertBodyContains({
@@ -90,6 +86,19 @@ test.group('Match', (group) => {
     assert.equal(response.body().data.meta.total, 48)
 
     // Assert other properties of the response
+
+    const returnedMatches = response.body().data
+
+    response.assertBodyContains({
+      data: {
+        data: returnedMatches.data.map((match) => ({
+          id: match.id,
+          group_id: match.group_id,
+          team1: match.team1,
+          team2: match.team2,
+        })),
+      },
+    })
   }).tags(['match', 'get_matches'])
 
   test('should return a match', async ({ client, assert }) => {
