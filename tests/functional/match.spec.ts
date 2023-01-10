@@ -64,7 +64,7 @@ test.group('Match', (group) => {
     })
 
     const createdMatch = response.body().data
-
+    console.log(response.error())
     response.assertStatus(201)
     response.assertBodyContains({
       data: {
@@ -74,7 +74,9 @@ test.group('Match', (group) => {
         team2: teams[1],
       },
     })
-  }).tags(['match', 'store_match'])
+  })
+    .tags(['match', 'store_match'])
+    .pin()
 
   test('should return a list of matches', async ({ client, assert, route }) => {
     await createGroupTeamsMatches(assert)
@@ -133,14 +135,21 @@ test.group('Match', (group) => {
       match_date: matchAttributes.matchDate,
     })
 
+    const updatededMatch = response.body().data
+    // Assert the edited `start_time` and `match_date`
     response.assertStatus(200)
     response.assertBodyContains({
-      data: { id: match.id, group_id: match.groupId },
+      data: {
+        id: match.id,
+        group_id: match.groupId,
+        match_date: updatededMatch.match_date,
+        start_time: updatededMatch.start_time,
+      },
       message: 'Match was edited',
     })
-
-    // Assert the edited `start_time` and `match_date`
-  }).tags(['match', 'update_match'])
+  })
+    .tags(['match', 'update_match'])
+    .pin()
 
   test('should delete a match', async ({ client, assert }) => {
     await createGroupTeamsMatches(assert)
@@ -157,7 +166,12 @@ test.group('Match', (group) => {
       data: { id: deletedMatch.id, name: deletedMatch.name },
       message: 'Match was deleted',
     })
-
     // Assert that match does not exist
-  }).tags(['group', 'delete_group'])
+    assert.notInclude(
+      (await Match.all()).map((match) => match.id),
+      deletedMatch.id
+    )
+  })
+    .tags(['group', 'delete_group'])
+    .pin()
 })

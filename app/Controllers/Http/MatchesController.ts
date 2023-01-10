@@ -41,8 +41,8 @@ export default class MatchesController {
     const groupid = teams.map((team) => team.groupId)
 
     //persist data if both teams belong to the same group
-
-    if (groupid[0] !== groupid[1])
+    console.log(groupId, groupid)
+    if (groupid[0] !== groupid[1] && groupId[0] !== groupId)
       return response.badRequest({ message: 'Teams does not belong to the same group' })
 
     const match = await Match.create({
@@ -113,8 +113,6 @@ export default class MatchesController {
   public async destroy({ response, params }: HttpContextContract) {
     const match = await Match.findOrFail(params.id)
     await match.delete()
-    const deletedMatch = await Match.find(params.id)
-
-    if (!deletedMatch) return response.ok({ message: 'Match was deleted', data: match })
+    return response.ok({ message: 'Match was deleted', data: match })
   }
 }
