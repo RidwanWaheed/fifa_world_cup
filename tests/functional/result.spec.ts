@@ -14,8 +14,8 @@ test.group('Result', (group) => {
 
     const response = await client.post('/results').json({
       matchId: match.id,
-      homeScore: faker.datatype.number({ min: 0, max: 9 }),
-      awayScore: faker.datatype.number({ min: 0, max: 9 }),
+      team1Score: faker.datatype.number({ min: 0, max: 9 }),
+      team2Score: faker.datatype.number({ min: 0, max: 9 }),
     })
 
     const createdResult = response.body().data
@@ -40,7 +40,7 @@ test.group('Result', (group) => {
         data: results.map((result) => ({
           id: result.id,
           match_id: result.matchId,
-          home_score: result.homeScore,
+          team1_score: result.team1Score,
         })),
       },
     })
@@ -71,8 +71,8 @@ test.group('Result', (group) => {
     const resultId = faker.helpers.arrayElement(resultIds)
 
     const response = await client.patch(`/results/${resultId}`).json({
-      homeScore: faker.datatype.number({ min: 0, max: 9 }),
-      awayScore: faker.datatype.number({ min: 0, max: 9 }),
+      team1Score: faker.datatype.number({ min: 0, max: 9 }),
+      team2Score: faker.datatype.number({ min: 0, max: 9 }),
     })
 
     const updatedResult = response.body().data

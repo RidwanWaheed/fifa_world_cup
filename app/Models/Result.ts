@@ -10,10 +10,10 @@ export default class Result extends BaseModel {
   public matchId: number
 
   @column()
-  public homeScore: number
+  public team1Score: number
 
   @column()
-  public awayScore: number
+  public team2Score: number
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime

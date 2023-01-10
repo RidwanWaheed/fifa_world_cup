@@ -4,8 +4,8 @@ import MatchFactory from './MatchFactory'
 
 export default Factory.define(result, ({ faker }) => {
   return {
-    homeScore: faker.datatype.number({ min: 0, max: 9 }),
-    awayScore: faker.datatype.number({ min: 0, max: 9 }),
+    team1Score: faker.datatype.number({ min: 0, max: 9 }),
+    team2Score: faker.datatype.number({ min: 0, max: 9 }),
   }
 })
   .relation('matches', () => MatchFactory)
