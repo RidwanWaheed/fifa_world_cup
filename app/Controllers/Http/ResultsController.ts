@@ -11,18 +11,18 @@ export default class ResultsController {
           column: 'id',
         }),
       ]),
-      homeScore: schema.number(),
-      awayScore: schema.number(),
+      team1Score: schema.number(),
+      team2Score: schema.number(),
     })
 
-    const { matchId, homeScore, awayScore } = await request.validate({
+    const { matchId, team1Score, team2Score } = await request.validate({
       schema: resultSchema,
     })
 
     const result = await Result.create({
       matchId,
-      homeScore,
-      awayScore,
+      team1Score,
+      team2Score,
     })
 
     return response.created({ message: 'Result has been created', data: result })
@@ -43,18 +43,18 @@ export default class ResultsController {
 
   public async update({ response, request, params }: HttpContextContract) {
     const resultSchema = schema.create({
-      homeScore: schema.number(),
-      awayScore: schema.number(),
+      team1Score: schema.number(),
+      team2Score: schema.number(),
     })
 
-    const { homeScore, awayScore } = await request.validate({
+    const { team1Score, team2Score } = await request.validate({
       schema: resultSchema,
     })
 
     const result = await Result.findOrFail(params.id)
     result.merge({
-      homeScore,
-      awayScore,
+      team1Score,
+      team2Score,
     })
 
     await result.save()
