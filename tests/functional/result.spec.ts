@@ -29,11 +29,9 @@ test.group('Result', (group) => {
       team1Score: faker.datatype.number({ min: 0, max: 9 }),
       team2Score: faker.datatype.number({ min: 0, max: 9 }),
     })
-    console.log(response.error())
+
     response.assertStatus(422)
-  })
-    .tags(['result', 'store_result'])
-    .pin()
+  }).tags(['result', 'store_result'])
 
   test('should create a new result', async ({ client }) => {
     const match = await MatchFactory.create()

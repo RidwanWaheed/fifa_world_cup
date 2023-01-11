@@ -3,12 +3,35 @@ import { faker } from '@faker-js/faker'
 import Database from '@ioc:Adonis/Lucid/Database'
 import TeamFactory from 'Database/factories/TeamFactory'
 import GroupFactory from 'Database/factories/GroupFactory'
+import Team from 'App/Models/Team'
 
 test.group('Team', (group) => {
   group.each.setup(async () => {
     await Database.beginGlobalTransaction()
     return () => Database.rollbackGlobalTransaction()
   })
+
+  test('should return 422 error if `group_id` is not provided', async ({ client }) => {
+    const group = await GroupFactory.with('teams').create()
+
+    const response = await client.post('/teams').json({
+      name: faker.helpers.unique(faker.address.country),
+      group_ids: group.id,
+    })
+    response.assertStatus(422)
+  }).tags(['team', 'store_team'])
+
+  test('should return 422 error if a `team` is being assigned to a non-existing group', async ({
+    client,
+  }) => {
+    await GroupFactory.with('teams').create()
+
+    const response = await client.post('/teams').json({
+      name: faker.helpers.unique(faker.address.country),
+      group_ids: 5,
+    })
+    response.assertStatus(422)
+  }).tags(['team', 'store_team'])
 
   test('should create a new team', async ({ client }) => {
     const group = await GroupFactory.with('teams').create()
@@ -78,7 +101,7 @@ test.group('Team', (group) => {
     })
   }).tags(['team', 'update_team'])
 
-  test('should delete a team', async ({ client }) => {
+  test('should delete a team', async ({ client, assert }) => {
     const teams = await TeamFactory.createMany(4)
 
     const teamIds = teams.map((team) => team.id)
@@ -93,5 +116,10 @@ test.group('Team', (group) => {
       data: { id: deletedTeam.id, name: deletedTeam.name },
       message: 'Team was deleted',
     })
+    // Assert that match does not exist
+    assert.notInclude(
+      (await Team.all()).map((team) => team.id),
+      deletedTeam.id
+    )
   }).tags(['team', 'delete_team'])
 })

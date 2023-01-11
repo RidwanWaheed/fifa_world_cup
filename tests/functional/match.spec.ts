@@ -30,7 +30,7 @@ test.group('Match', (group) => {
     response.assertStatus(422)
   }).tags(['match', 'store_match'])
 
-  test('should return 400 error if `teams` does not belong got the same group', async ({
+  test('should return 400 error if `teams` does not belong to the same group', async ({
     client,
   }) => {
     // 1. Create a group with teams
@@ -64,7 +64,6 @@ test.group('Match', (group) => {
     })
 
     const createdMatch = response.body().data
-    console.log(response.error())
     response.assertStatus(201)
     response.assertBodyContains({
       data: {

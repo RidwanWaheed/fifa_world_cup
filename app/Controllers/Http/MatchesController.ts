@@ -41,7 +41,6 @@ export default class MatchesController {
     const groupid = teams.map((team) => team.groupId)
 
     //persist data if both teams belong to the same group
-    console.log(groupId, groupid)
     if (groupid[0] !== groupid[1] && groupId[0] !== groupId)
       return response.badRequest({ message: 'Teams does not belong to the same group' })
 
