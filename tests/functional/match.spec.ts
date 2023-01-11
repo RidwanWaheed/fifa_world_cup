@@ -74,9 +74,7 @@ test.group('Match', (group) => {
         team2: teams[1],
       },
     })
-  })
-    .tags(['match', 'store_match'])
-    .pin()
+  }).tags(['match', 'store_match'])
 
   test('should return a list of matches', async ({ client, assert, route }) => {
     await createGroupTeamsMatches(assert)
@@ -147,9 +145,7 @@ test.group('Match', (group) => {
       },
       message: 'Match was edited',
     })
-  })
-    .tags(['match', 'update_match'])
-    .pin()
+  }).tags(['match', 'update_match'])
 
   test('should delete a match', async ({ client, assert }) => {
     await createGroupTeamsMatches(assert)
@@ -171,7 +167,5 @@ test.group('Match', (group) => {
       (await Match.all()).map((match) => match.id),
       deletedMatch.id
     )
-  })
-    .tags(['group', 'delete_group'])
-    .pin()
+  }).tags(['group', 'delete_group'])
 })

@@ -2,12 +2,38 @@ import Database from '@ioc:Adonis/Lucid/Database'
 import { test } from '@japa/runner'
 import { faker } from '@faker-js/faker'
 import MatchFactory from 'Database/factories/MatchFactory'
+import Result from 'App/Models/Result'
 
 test.group('Result', (group) => {
   group.each.setup(async () => {
     await Database.beginGlobalTransaction()
     return () => Database.rollbackGlobalTransaction()
   })
+
+  test('should return 422 error if `match_id` is not provided', async ({ client }) => {
+    await MatchFactory.create()
+
+    const response = await client.post('/results').json({
+      team1Score: faker.datatype.number({ min: 0, max: 9 }),
+      team2Score: faker.datatype.number({ min: 0, max: 9 }),
+    })
+
+    response.assertStatus(422)
+  }).tags(['result', 'store_result'])
+
+  test('should return 422 error if non-existing `match_id` is provided', async ({ client }) => {
+    await MatchFactory.create()
+
+    const response = await client.post('/results').json({
+      matchId: 5,
+      team1Score: faker.datatype.number({ min: 0, max: 9 }),
+      team2Score: faker.datatype.number({ min: 0, max: 9 }),
+    })
+    console.log(response.error())
+    response.assertStatus(422)
+  })
+    .tags(['result', 'store_result'])
+    .pin()
 
   test('should create a new result', async ({ client }) => {
     const match = await MatchFactory.create()
@@ -41,6 +67,7 @@ test.group('Result', (group) => {
           id: result.id,
           match_id: result.matchId,
           team1_score: result.team1Score,
+          team2_score: result.team2Score,
         })),
       },
     })
@@ -84,7 +111,7 @@ test.group('Result', (group) => {
     })
   }).tags(['result', 'update_result'])
 
-  test('should delete a resul', async ({ client }) => {
+  test('should delete a result', async ({ client, assert }) => {
     const matches = await MatchFactory.with('result').createMany(10)
     const results = matches.map((match) => match.result)
 
@@ -93,12 +120,22 @@ test.group('Result', (group) => {
 
     const response = await client.delete(`/results/${resultId}`)
 
-    const deletedMatch = response.body().data
+    const deletedResult = response.body().data
 
     response.assertStatus(200)
     response.assertBodyContains({
-      data: { id: deletedMatch.id, match_id: deletedMatch.match_id },
+      data: {
+        id: deletedResult.id,
+        match_id: deletedResult.match_id,
+        team1_score: deletedResult.team1_score,
+        team2_score: deletedResult.team2_score,
+      },
       message: 'Result was deleted',
     })
-  }).tags(['group', 'delete_group'])
+    // Assert that result does not exist
+    assert.notInclude(
+      (await Result.all()).map((result) => result.id),
+      deletedResult.id
+    )
+  }).tags(['result', 'delete_result'])
 })
