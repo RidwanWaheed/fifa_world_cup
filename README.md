@@ -13,20 +13,35 @@ AdonisJS is a Node.js framework that brings fluency and expressiveness to the No
 
 The project was a FIFA World Cup web application that provided and stored details about the group stage, such as the 32 teams, matches played, teams in each group, match results, and so on.
 The backend should provide the following API endpoints:
+
 	Endpoint for creating a group.
+
 	Endpoint for listing all groups.
+
 	Endpoint for fetching a single group (with all matches played in the group and the results of the matches).
+
 	Endpoint for updating a single group.
+
 	Endpoint for deleting a single group.
+
 	Endpoint for creating a team (and assigning the team to a group).
+
 	Endpoint for listing all team.
+
 	Endpoint for fetching a single team.
+
 	Endpoint for updating a single team.
+
 	Endpoint for deleting a single team.
+
 	Endpoint for creating a match.
+
 	Endpoint for listing all matches played with results of the matches.
+
 	Endpoint for fetching a single match with result of the match.
+
 	Endpoint for updating a single match (including the result of the match).
+
 	Endpoint for deleting a single match.
 
 **The methodology**
