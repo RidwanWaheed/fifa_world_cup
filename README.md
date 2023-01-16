@@ -1,6 +1,7 @@
 ﻿**A short report on FIFA-world-cup web app api development using AdonisJS by Ridwan W.**
 
 **Project summary and aim**
+
 The goal of this project is to help me gain familiarity with API development using the AdonisJS framework and to work with a junior front-end developer. This project tested my knowledge and helped me become comfortable building RESTful APIs with AdonisJS. I became familiar with the AdonisJS folder structure, concepts such as routing and controllers, database migration, models, factories, seeders, validators, middleware, and testing. I learned how to connect to the database, store and retrieve data, create endpoints, and, most importantly, API testing. Testing was particularly challenging for me as I was not familiar with it, having primarily used Postman to test API endpoints while following a series.
 Having completing the assignment, I am using this report as an opportunity to revisit the project from the start and document every process involved in developing the API. Furthermore, it allows me to become more familiar with the AdonisJS framework and to learn and reinforce important concepts found in the AdonisJS documentation.
 
