@@ -13,6 +13,9 @@ export default class Team extends BaseModel {
   @column()
   public groupId: number
 
+  @column()
+  public flag: string
+
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
 
