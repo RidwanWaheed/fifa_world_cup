@@ -39,6 +39,7 @@ test.group('Team', (group) => {
     const response = await client.post('/teams').json({
       name: faker.helpers.unique(faker.address.country),
       group_id: group.id,
+      flag: faker.internet.url(),
     })
 
     const createdTeam = response.body().data
@@ -48,7 +49,9 @@ test.group('Team', (group) => {
       data: { id: createdTeam.id, name: createdTeam.name },
       message: 'Team has been created',
     })
-  }).tags(['team', 'store_team'])
+  })
+    .tags(['team', 'store_team'])
+    .pin()
 
   test('should return a list of teams', async ({ client, route }) => {
     const teams = await TeamFactory.createMany(32)
@@ -90,6 +93,7 @@ test.group('Team', (group) => {
     const response = await client.put(`/teams/${teamId}`).json({
       name: faker.helpers.unique(faker.address.country),
       group_id: group.id,
+      flag: faker.internet.url(),
     })
 
     const updatedTeam = response.body().data
@@ -99,7 +103,9 @@ test.group('Team', (group) => {
       data: { id: updatedTeam.id, name: updatedTeam.name },
       message: 'Team was edited',
     })
-  }).tags(['team', 'update_team'])
+  })
+    .tags(['team', 'update_team'])
+    .pin()
 
   test('should delete a team', async ({ client, assert }) => {
     const teams = await TeamFactory.createMany(4)

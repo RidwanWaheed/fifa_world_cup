@@ -6,6 +6,7 @@ import MatchFactory from './MatchFactory'
 export default Factory.define(Team, async ({ faker }) => {
   return {
     name: faker.helpers.unique(faker.address.country),
+    flag: faker.internet.url(),
   }
 })
   .relation('group', () => GroupFactory)

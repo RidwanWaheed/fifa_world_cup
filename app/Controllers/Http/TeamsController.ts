@@ -12,15 +12,25 @@ export default class TeamsController {
           column: 'id',
         }),
       ]),
+      flag: schema.string([
+        rules.url({
+          protocols: ['http', 'https'],
+        }),
+      ]),
     })
 
-    const { name: name, group_id: groupId } = await request.validate({
+    const {
+      name: name,
+      group_id: groupId,
+      flag: flag,
+    } = await request.validate({
       schema: teamSchema,
     })
 
     const team = await Team.create({
       name,
       groupId,
+      flag,
     })
 
     return response.created({ message: 'Team has been created', data: team })
@@ -45,9 +55,18 @@ export default class TeamsController {
           column: 'id',
         }),
       ]),
+      flag: schema.string([
+        rules.url({
+          protocols: ['http', 'https'],
+        }),
+      ]),
     })
 
-    const { name: name, group_id: groupId } = await request.validate({
+    const {
+      name: name,
+      group_id: groupId,
+      flag: flag,
+    } = await request.validate({
       schema: teamSchema,
     })
 
@@ -55,6 +74,7 @@ export default class TeamsController {
     team.merge({
       name,
       groupId: groupId ?? team.groupId,
+      flag: flag ?? team.flag,
     })
 
     await team.save()
