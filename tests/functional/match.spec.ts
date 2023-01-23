@@ -64,6 +64,7 @@ test.group('Match', (group) => {
     })
 
     const createdMatch = response.body().data
+
     response.assertStatus(201)
     response.assertBodyContains({
       data: {
@@ -83,8 +84,6 @@ test.group('Match', (group) => {
     response.assertStatus(200)
 
     assert.equal(response.body().data.meta.total, 48)
-
-    // Assert other properties of the response
 
     const returnedMatches = response.body().data
 

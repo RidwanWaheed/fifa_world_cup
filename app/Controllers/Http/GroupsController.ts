@@ -24,7 +24,7 @@ export default class GroupsController {
     const querystring = request.qs()
     const { page = 1, per_page: perPage = 20 } = querystring
 
-    const groups = await Group.query().paginate(page, perPage)
+    const groups = await Group.query().preload('teams').paginate(page, perPage)
     return response.ok({ data: groups })
   }
 

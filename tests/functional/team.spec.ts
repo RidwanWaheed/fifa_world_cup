@@ -49,9 +49,7 @@ test.group('Team', (group) => {
       data: { id: createdTeam.id, name: createdTeam.name },
       message: 'Team has been created',
     })
-  })
-    .tags(['team', 'store_team'])
-    .pin()
+  }).tags(['team', 'store_team'])
 
   test('should return a list of teams', async ({ client, route }) => {
     const teams = await TeamFactory.createMany(32)
@@ -103,9 +101,7 @@ test.group('Team', (group) => {
       data: { id: updatedTeam.id, name: updatedTeam.name },
       message: 'Team was edited',
     })
-  })
-    .tags(['team', 'update_team'])
-    .pin()
+  }).tags(['team', 'update_team'])
 
   test('should delete a team', async ({ client, assert }) => {
     const teams = await TeamFactory.createMany(4)
