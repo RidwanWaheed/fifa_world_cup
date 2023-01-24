@@ -9,7 +9,7 @@ export default class ResultSeeder extends BaseSeeder {
   }
 
   public static async createResults() {
-    return await MatchFactory.with('result').with('teamOne').with('teamTwo').createMany(10)
+    // return await ResultFactory.createMany(48)
   }
 
   public static async fetchResults() {

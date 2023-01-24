@@ -2,6 +2,7 @@ import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Result from 'App/Models/Result'
 import Database from '@ioc:Adonis/Lucid/Database'
+import Group from 'App/Models/Group'
 
 export default class ResultsController {
   public async store({ request, response }: HttpContextContract) {
@@ -37,19 +38,13 @@ export default class ResultsController {
       .join('matches as m', 'results.match_id', '=', 'm.id')
       .join('teams as t1', 'm.team1', '=', 't1.id')
       .join('teams as t2', 'm.team2', '=', 't2.id')
+      .join('groups as g', 'm.group_id', '=', 'g.id')
       .select('results.team1_score', 'results.team2_score', 'results.match_id')
-      .select('t1.name as team1', 't2.name as team2', 't1.group_id', 'm.match_date')
+      .select('t1.name as team1', 't2.name as team2', 'm.match_date')
+      .select('g.name as group_name')
       .paginate(page, perPage)
 
-    const groupedData = results.reduce((acc, match) => {
-      if (!acc[match.group_id]) {
-        acc[match.group_id] = []
-      }
-      acc[match.group_id].push(match)
-      return acc
-    }, {})
-
-    return response.ok({ data: groupedData })
+    return response.ok({ data: results })
   }
 
   public async show({ response, params }: HttpContextContract) {

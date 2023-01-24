@@ -3,6 +3,8 @@ import { test } from '@japa/runner'
 import { faker } from '@faker-js/faker'
 import MatchFactory from 'Database/factories/MatchFactory'
 import Result from 'App/Models/Result'
+import GroupFactory from 'Database/factories/GroupFactory'
+import { createGroupTeamsMatches } from 'App/Helpers/TestHelper'
 
 test.group('Result', (group) => {
   group.each.setup(async () => {
@@ -51,21 +53,23 @@ test.group('Result', (group) => {
     })
   }).tags(['result', 'store_result'])
 
-  test('should return a list of results', async ({ client }) => {
-    const matches = await MatchFactory.with('result').createMany(10)
-    const results = matches.map((match) => match.result)
+  test('should return a list of results', async ({ client, assert }) => {
+    await createGroupTeamsMatches(assert)
 
     const response = await client.get('/results')
 
+    const returnedResults = response.body().data
+
+    assert.equal(response.body().data.meta.total, 48)
+
     response.assertStatus(200)
+
     response.assertBodyContains({
       data: {
-        meta: { total: results.length },
-        data: results.map((result) => ({
-          id: result.id,
-          match_id: result.matchId,
-          team1_score: result.team1Score,
-          team2_score: result.team2Score,
+        data: returnedResults.data.map((result) => ({
+          match_id: result.match_id,
+          team1_score: result.team1_score,
+          team2_score: result.team2_score,
         })),
       },
     })
