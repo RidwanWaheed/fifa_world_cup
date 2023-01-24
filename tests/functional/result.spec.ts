@@ -38,16 +38,16 @@ test.group('Result', (group) => {
     const match = await MatchFactory.create()
 
     const response = await client.post('/results').json({
-      matchId: match.id,
-      team1Score: faker.datatype.number({ min: 0, max: 9 }),
-      team2Score: faker.datatype.number({ min: 0, max: 9 }),
+      match_id: match.id,
+      team1_score: faker.datatype.number({ min: 0, max: 9 }),
+      team2_score: faker.datatype.number({ min: 0, max: 9 }),
     })
 
     const createdResult = response.body().data
 
     response.assertStatus(201)
     response.assertBodyContains({
-      data: { id: createdResult.id, matchId: createdResult.matchId },
+      data: { id: createdResult.id, match_id: createdResult.match_id },
       message: 'Result has been created',
     })
   }).tags(['result', 'store_result'])
@@ -99,8 +99,8 @@ test.group('Result', (group) => {
     const resultId = faker.helpers.arrayElement(resultIds)
 
     const response = await client.patch(`/results/${resultId}`).json({
-      team1Score: faker.datatype.number({ min: 0, max: 9 }),
-      team2Score: faker.datatype.number({ min: 0, max: 9 }),
+      team1_score: faker.datatype.number({ min: 0, max: 9 }),
+      team2_score: faker.datatype.number({ min: 0, max: 9 }),
     })
 
     const updatedResult = response.body().data

@@ -6,24 +6,24 @@ import Database from '@ioc:Adonis/Lucid/Database'
 export default class ResultsController {
   public async store({ request, response }: HttpContextContract) {
     const resultSchema = schema.create({
-      matchId: schema.number([
+      match_id: schema.number([
         rules.exists({
           table: 'matches',
           column: 'id',
         }),
       ]),
-      team1Score: schema.number(),
-      team2Score: schema.number(),
+      team1_score: schema.number(),
+      team2_score: schema.number(),
     })
 
-    const { matchId, team1Score, team2Score } = await request.validate({
+    const { match_id, team1_score, team2_score } = await request.validate({
       schema: resultSchema,
     })
 
     const result = await Result.create({
-      matchId,
-      team1Score,
-      team2Score,
+      matchId: match_id,
+      team1Score: team1_score,
+      team2Score: team2_score,
     })
 
     return response.created({ message: 'Result has been created', data: result })
@@ -53,18 +53,18 @@ export default class ResultsController {
 
   public async update({ response, request, params }: HttpContextContract) {
     const resultSchema = schema.create({
-      team1Score: schema.number(),
-      team2Score: schema.number(),
+      team1_score: schema.number(),
+      team2_score: schema.number(),
     })
 
-    const { team1Score, team2Score } = await request.validate({
+    const { team1_score, team2_score } = await request.validate({
       schema: resultSchema,
     })
 
     const result = await Result.findOrFail(params.id)
     result.merge({
-      team1Score,
-      team2Score,
+      team1Score: team1_score,
+      team2Score: team2_score,
     })
 
     await result.save()
