@@ -56,11 +56,11 @@ export default class MatchesController {
     }
 
     const match = await Match.create({
-      groupId,
+      groupId: groupId.toString(),
       matchDate,
       startTime,
-      team1: teamIds[0],
-      team2: teamIds[1],
+      team1: teamIds[0].toString(),
+      team2: teamIds[1].toString(),
     })
 
     return response.created({ message: 'Match has been created', data: match })
@@ -111,8 +111,8 @@ export default class MatchesController {
     match.merge({
       matchDate,
       startTime,
-      team1: teamIds[0],
-      team2: teamIds[1],
+      team1: teamIds[0].toString(),
+      team2: teamIds[1].toString(),
     })
 
     await match.save()
