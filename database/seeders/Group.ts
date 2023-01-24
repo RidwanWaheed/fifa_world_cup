@@ -1,4 +1,5 @@
 import BaseSeeder from '@ioc:Adonis/Lucid/Seeder'
+import { createGroupTeamsMatches } from 'App/Helpers/TestHelper'
 import Group from 'App/Models/Group'
 import GroupFactory from 'Database/factories/GroupFactory'
 
@@ -8,7 +9,7 @@ export default class GroupSeeder extends BaseSeeder {
   }
 
   public static async createGroups() {
-    return GroupFactory.with('teams', 4).createMany(8)
+    return createGroupTeamsMatches()
   }
 
   public static async fetchGroups() {
