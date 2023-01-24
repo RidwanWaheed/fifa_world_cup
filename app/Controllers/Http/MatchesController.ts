@@ -44,6 +44,17 @@ export default class MatchesController {
     if (groupid[0] !== groupid[1] && groupId[0] !== groupId)
       return response.badRequest({ message: 'Teams does not belong to the same group' })
 
+    //check if match has already been created
+    const existingMatch = await Match.query()
+      .where('group_id', groupId)
+      .where('team1', teamIds[0])
+      .where('team2', teamIds[1])
+      .first()
+
+    if (existingMatch) {
+      return response.badRequest({ message: 'Match already exists' })
+    }
+
     const match = await Match.create({
       groupId,
       matchDate,

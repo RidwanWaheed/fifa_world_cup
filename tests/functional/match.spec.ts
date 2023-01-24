@@ -74,7 +74,35 @@ test.group('Match', (group) => {
         team2: teams[1],
       },
     })
-  }).tags(['match', 'store_match'])
+  })
+    .tags(['match', 'store_match'])
+    .pin()
+
+  test('should check if match already exist and throw a 400 error', async ({ client, assert }) => {
+    // 1. Create a group with teams
+    const group = await GroupFactory.with('teams', 2).create()
+    const teams = group.teams.map((team) => team.id)
+    assert.equal(teams.length, 2)
+    const matchAttributes = await MatchFactory.make()
+
+    await client.post('/matches').json({
+      team_ids: teams,
+      start_time: matchAttributes.startTime,
+      match_date: matchAttributes.matchDate,
+      group_id: group.id,
+    })
+
+    const response = await client.post('/matches').json({
+      team_ids: teams,
+      start_time: matchAttributes.startTime,
+      match_date: matchAttributes.matchDate,
+      group_id: group.id,
+    })
+
+    response.assertStatus(400)
+  })
+    .tags(['match', 'store_match'])
+    .pin()
 
   test('should return a list of matches', async ({ client, assert, route }) => {
     await createGroupTeamsMatches(assert)
