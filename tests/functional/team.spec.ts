@@ -44,7 +44,7 @@ test.group('Team', (group) => {
     })
 
     const createdTeam = response.body().data
-    console.log(createdTeam)
+
     response.assertStatus(201)
     response.assertBodyContains({
       data: { id: createdTeam.id, name: createdTeam.name },
@@ -58,8 +58,6 @@ test.group('Team', (group) => {
     const response = await client.get(route('/teams', [], { qs: { per_page: 50 } }))
 
     const returnedTeams = response.body().data
-
-    // console.log(returnedTeams)
 
     response.assertStatus(200)
 

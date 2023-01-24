@@ -68,9 +68,9 @@ test.group('Match', (group) => {
     response.assertBodyContains({
       data: {
         id: createdMatch.id,
-        group_id: createdMatch.group_id,
-        team1: teams[0],
-        team2: teams[1],
+        group_id: createdMatch.group_id.toString(),
+        team1: teams[0].toString(),
+        team2: teams[1].toString(),
       },
     })
   }).tags(['match', 'store_match'])
