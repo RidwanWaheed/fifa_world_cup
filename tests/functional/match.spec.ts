@@ -74,9 +74,7 @@ test.group('Match', (group) => {
         team2: teams[1],
       },
     })
-  })
-    .tags(['match', 'store_match'])
-    .pin()
+  }).tags(['match', 'store_match'])
 
   test('should check if match already exist and throw a 400 error', async ({ client, assert }) => {
     // 1. Create a group with teams
@@ -100,9 +98,7 @@ test.group('Match', (group) => {
     })
 
     response.assertStatus(400)
-  })
-    .tags(['match', 'store_match'])
-    .pin()
+  }).tags(['match', 'store_match'])
 
   test('should return a list of matches', async ({ client, assert, route }) => {
     await createGroupTeamsMatches(assert)

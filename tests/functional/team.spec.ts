@@ -4,6 +4,7 @@ import Database from '@ioc:Adonis/Lucid/Database'
 import TeamFactory from 'Database/factories/TeamFactory'
 import GroupFactory from 'Database/factories/GroupFactory'
 import Team from 'App/Models/Team'
+import { createGroupTeamsMatches } from 'App/Helpers/TestHelper'
 
 test.group('Team', (group) => {
   group.each.setup(async () => {
@@ -43,7 +44,7 @@ test.group('Team', (group) => {
     })
 
     const createdTeam = response.body().data
-
+    console.log(createdTeam)
     response.assertStatus(201)
     response.assertBodyContains({
       data: { id: createdTeam.id, name: createdTeam.name },
@@ -51,26 +52,28 @@ test.group('Team', (group) => {
     })
   }).tags(['team', 'store_team'])
 
-  test('should return a list of teams', async ({ client, route }) => {
-    const teams = await TeamFactory.createMany(32)
+  test('should return a list of teams', async ({ client, route, assert }) => {
+    await createGroupTeamsMatches(assert)
 
     const response = await client.get(route('/teams', [], { qs: { per_page: 50 } }))
+
+    const returnedTeams = response.body().data
+
+    // console.log(returnedTeams)
 
     response.assertStatus(200)
 
     response.assertBodyContains({
       data: {
-        data: teams.map((team) => ({ name: team.name, id: team.id })),
-        meta: { total: teams.length },
+        data: returnedTeams.data.map((team) => ({ name: team.name, id: team.id })),
+        meta: { total: returnedTeams.data.length },
       },
     })
   }).tags(['team', 'get_team'])
 
   test('should return a team', async ({ client }) => {
-    const teams = await TeamFactory.createMany(32)
-
-    const teamIds = teams.map((team) => team.id)
-    const teamId = faker.helpers.arrayElement(teamIds)
+    const team = await TeamFactory.create()
+    const teamId = team.id
 
     const response = await client.get(`/teams/${teamId}`)
 
@@ -104,10 +107,8 @@ test.group('Team', (group) => {
   }).tags(['team', 'update_team'])
 
   test('should delete a team', async ({ client, assert }) => {
-    const teams = await TeamFactory.createMany(4)
-
-    const teamIds = teams.map((team) => team.id)
-    const teamId = faker.helpers.arrayElement(teamIds)
+    const team = await TeamFactory.create()
+    const teamId = team.id
 
     const response = await client.delete(`/teams/${teamId}`)
 
