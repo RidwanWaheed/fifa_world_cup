@@ -5,7 +5,6 @@ import Database from '@ioc:Adonis/Lucid/Database'
 import GroupFactory from 'Database/factories/GroupFactory'
 import MatchFactory from 'Database/factories/MatchFactory'
 import { createGroupTeamsMatches } from 'App/Helpers/TestHelper'
-import { assert } from '@japa/preset-adonis'
 
 test.group('Match', (group) => {
   group.each.setup(async () => {

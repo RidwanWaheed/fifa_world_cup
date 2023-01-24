@@ -3,7 +3,6 @@ import { test } from '@japa/runner'
 import { faker } from '@faker-js/faker'
 import MatchFactory from 'Database/factories/MatchFactory'
 import Result from 'App/Models/Result'
-import GroupFactory from 'Database/factories/GroupFactory'
 import { createGroupTeamsMatches } from 'App/Helpers/TestHelper'
 
 test.group('Result', (group) => {

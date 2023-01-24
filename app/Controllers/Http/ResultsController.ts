@@ -2,7 +2,6 @@ import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Result from 'App/Models/Result'
 import Database from '@ioc:Adonis/Lucid/Database'
-import Group from 'App/Models/Group'
 
 export default class ResultsController {
   public async store({ request, response }: HttpContextContract) {
