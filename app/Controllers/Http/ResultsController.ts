@@ -39,7 +39,13 @@ export default class ResultsController {
       .join('teams as t2', 'm.team2', '=', 't2.id')
       .join('groups as g', 'm.group_id', '=', 'g.id')
       .select('results.team1_score', 'results.team2_score', 'results.match_id')
-      .select('t1.name as team1', 't2.name as team2', 'm.match_date')
+      .select(
+        't1.name as team1',
+        't1.flag as team1_flag',
+        't2.flag as team2_flag',
+        't2.name as team2',
+        'm.match_date'
+      )
       .select('g.name as group_name')
       .paginate(page, perPage)
 
