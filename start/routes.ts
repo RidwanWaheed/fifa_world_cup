@@ -55,4 +55,6 @@ Route.get('results/:id', 'ResultsController.show')
 Route.patch('results/:id', 'ResultsController.update')
 Route.delete('/results/:id', 'ResultsController.destroy')
 
-Route.post('/matches/:id', 'TeamsMatchesController.store')
+Route.post('register', 'AuthController.register')
+Route.post('login', 'AuthController.login')
+Route.get('logout', 'AuthController.logout')
