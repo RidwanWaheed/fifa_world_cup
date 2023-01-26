@@ -14,15 +14,20 @@ export default class AuthController {
       email: schema.string([
         rules.trim(),
         rules.email(),
-        rules.escape(),
-        rules.maxLength(30),
-        rules.unique({ table: 'users', column: 'username', caseInsensitive: true }),
+        rules.unique({ table: 'users', column: 'email', caseInsensitive: true }),
       ]),
-      password: schema.string([rules.minLength(8)]),
+      password: schema.string([rules.minLength(8), rules.trim()]),
     })
 
     const { username, email, password } = await request.validate({
       schema: userSchema,
+      messages: {
+        'username.required': 'The {{ field }} is required to create a new account',
+        'username.unique': 'Username not available',
+        'email.required': 'The {{ field }} is required to create a new account',
+        'email.unique': 'Email has already been used',
+        'password.minLength': 'Password length must be greater than eight',
+      },
     })
 
     const user = await User.create({
@@ -42,7 +47,7 @@ export default class AuthController {
     try {
       await auth.attempt(username, password)
     } catch (error) {
-      return response.badRequest('Invalid credentials')
+      return response.unauthorized({ message: 'Invalid credentials' })
     }
     response.ok({ message: 'Login successful' })
   }
