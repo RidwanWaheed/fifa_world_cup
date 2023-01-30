@@ -1,8 +1,8 @@
 import { test } from '@japa/runner'
 import { faker } from '@faker-js/faker'
 import Database from '@ioc:Adonis/Lucid/Database'
-import Group from 'App/Models/Group'
 import GroupFactory from 'Database/factories/GroupFactory'
+import UserFactory from 'Database/factories/UserFactory'
 
 test.group('Groups', (group) => {
   group.each.setup(async () => {
@@ -11,11 +11,16 @@ test.group('Groups', (group) => {
   })
 
   test('should create a new group', async ({ client }) => {
-    await GroupFactory.createMany(8)
+    const user = await UserFactory.create()
+    const groupAttributes = await GroupFactory.make()
 
-    const response = await client.post('/groups').json({
-      name: faker.random.words(2),
-    })
+    const response = await client
+      .post('/groups')
+      .json({
+        name: groupAttributes.name,
+      })
+      .guard('web')
+      .loginAs(user)
 
     const createdGroup = response.body().data
 
@@ -41,12 +46,9 @@ test.group('Groups', (group) => {
   }).tags(['group', 'get_groups'])
 
   test('should return a group', async ({ client }) => {
-    const groups = await GroupFactory.createMany(8)
+    const group = await GroupFactory.create()
 
-    const groupIds = groups.map((group) => group.id)
-    const groupId = faker.helpers.arrayElement(groupIds)
-
-    const response = await client.get(`/groups/${groupId}`)
+    const response = await client.get(`/groups/${group.id}`)
 
     const returnedGroup = response.body().data
 
@@ -57,14 +59,17 @@ test.group('Groups', (group) => {
   }).tags(['group', 'get_group'])
 
   test('should update a group', async ({ client }) => {
-    await GroupFactory.createMany(8)
+    const group = await GroupFactory.create()
+    const user = await UserFactory.create()
+    const groupAttributes = await GroupFactory.make()
 
-    const groupIds = (await Group.all()).map((group) => group.id)
-    const groupId = faker.helpers.arrayElement(groupIds)
-
-    const response = await client.put(`/groups/${groupId}`).json({
-      name: faker.random.words(2),
-    })
+    const response = await client
+      .put(`/groups/${group.id}`)
+      .json({
+        name: groupAttributes.name,
+      })
+      .guard('web')
+      .loginAs(user)
 
     const updatedGroup = response.body().data
 
@@ -76,12 +81,10 @@ test.group('Groups', (group) => {
   }).tags(['group', 'update_group'])
 
   test('should delete a group', async ({ client }) => {
-    await GroupFactory.createMany(8)
+    const group = await GroupFactory.create()
+    const user = await UserFactory.create()
 
-    const groupIds = (await Group.all()).map((group) => group.id)
-    const groupId = faker.helpers.arrayElement(groupIds)
-
-    const response = await client.delete(`/groups/${groupId}`)
+    const response = await client.delete(`/groups/${group.id}`).guard('web').loginAs(user)
 
     const deletedGroup = response.body().data
 

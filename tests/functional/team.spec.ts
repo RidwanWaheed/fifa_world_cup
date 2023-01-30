@@ -5,6 +5,7 @@ import TeamFactory from 'Database/factories/TeamFactory'
 import GroupFactory from 'Database/factories/GroupFactory'
 import Team from 'App/Models/Team'
 import { createGroupTeamsMatches } from 'App/Helpers/TestHelper'
+import UserFactory from 'Database/factories/UserFactory'
 
 test.group('Team', (group) => {
   group.each.setup(async () => {
@@ -13,35 +14,56 @@ test.group('Team', (group) => {
   })
 
   test('should return 422 error if `group_id` is not provided', async ({ client }) => {
-    const group = await GroupFactory.with('teams').create()
+    const user = await UserFactory.create()
 
-    const response = await client.post('/teams').json({
-      name: faker.helpers.unique(faker.address.country),
-      group_ids: group.id,
-    })
+    const teamAttributes = await TeamFactory.make()
+    const response = await client
+      .post('/teams')
+      .json({
+        name: teamAttributes.name,
+      })
+      .guard('web')
+      .loginAs(user)
+
     response.assertStatus(422)
   }).tags(['team', 'store_team'])
 
   test('should return 422 error if a `team` is being assigned to a non-existing group', async ({
     client,
   }) => {
-    await GroupFactory.with('teams').create()
+    const user = await UserFactory.create()
 
-    const response = await client.post('/teams').json({
-      name: faker.helpers.unique(faker.address.country),
-      group_ids: 5,
-    })
+    const teamAttributes = await TeamFactory.make()
+
+    const response = await client
+      .post('/teams')
+      .json({
+        name: teamAttributes.name,
+        group_id: faker.random.numeric(1),
+        flag: teamAttributes.flag,
+      })
+      .guard('web')
+      .loginAs(user)
+
     response.assertStatus(422)
   }).tags(['team', 'store_team'])
 
   test('should create a new team', async ({ client }) => {
     const group = await GroupFactory.with('teams').create()
 
-    const response = await client.post('/teams').json({
-      name: faker.helpers.unique(faker.address.country),
-      group_id: group.id,
-      flag: faker.internet.url(),
-    })
+    const user = await UserFactory.create()
+
+    const teamAttributes = await TeamFactory.make()
+
+    const response = await client
+      .post('/teams')
+      .json({
+        name: teamAttributes.name,
+        group_id: group.id,
+        flag: teamAttributes.flag,
+      })
+      .guard('web')
+      .loginAs(user)
 
     const createdTeam = response.body().data
 
@@ -71,9 +93,8 @@ test.group('Team', (group) => {
 
   test('should return a team', async ({ client }) => {
     const team = await TeamFactory.create()
-    const teamId = team.id
 
-    const response = await client.get(`/teams/${teamId}`)
+    const response = await client.get(`/teams/${team.id}`)
 
     const returnedTeam = response.body().data
 
@@ -84,16 +105,23 @@ test.group('Team', (group) => {
   }).tags(['team', 'get_team'])
 
   test('should update a team', async ({ client }) => {
-    const group = await GroupFactory.with('teams', 4).create()
+    const group = await GroupFactory.with('teams').create()
 
-    const teamIds = group.teams.map((team) => team.id)
-    const teamId = faker.helpers.arrayElement(teamIds)
+    const team = await TeamFactory.create()
 
-    const response = await client.put(`/teams/${teamId}`).json({
-      name: faker.helpers.unique(faker.address.country),
-      group_id: group.id,
-      flag: faker.internet.url(),
-    })
+    const user = await UserFactory.create()
+
+    const teamAttributes = await TeamFactory.make()
+
+    const response = await client
+      .put(`/teams/${team.id}`)
+      .json({
+        name: teamAttributes.name,
+        group_id: group.id,
+        flag: teamAttributes.flag,
+      })
+      .guard('web')
+      .loginAs(user)
 
     const updatedTeam = response.body().data
 
@@ -106,9 +134,10 @@ test.group('Team', (group) => {
 
   test('should delete a team', async ({ client, assert }) => {
     const team = await TeamFactory.create()
-    const teamId = team.id
 
-    const response = await client.delete(`/teams/${teamId}`)
+    const user = await UserFactory.create()
+
+    const response = await client.delete(`/teams/${team.id}`).guard('web').loginAs(user)
 
     const deletedTeam = response.body().data
 

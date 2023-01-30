@@ -4,6 +4,8 @@ import { faker } from '@faker-js/faker'
 import MatchFactory from 'Database/factories/MatchFactory'
 import Result from 'App/Models/Result'
 import { createGroupTeamsMatches } from 'App/Helpers/TestHelper'
+import ResultFactory from 'Database/factories/ResultFactory'
+import UserFactory from 'Database/factories/UserFactory'
 
 test.group('Result', (group) => {
   group.each.setup(async () => {
@@ -12,36 +14,55 @@ test.group('Result', (group) => {
   })
 
   test('should return 422 error if `match_id` is not provided', async ({ client }) => {
-    await MatchFactory.create()
+    const user = await UserFactory.create()
 
-    const response = await client.post('/results').json({
-      team1Score: faker.datatype.number({ min: 0, max: 9 }),
-      team2Score: faker.datatype.number({ min: 0, max: 9 }),
-    })
+    const resultAttributes = await ResultFactory.make()
+
+    const response = await client
+      .post('/results')
+      .json({
+        team1_score: resultAttributes.team1Score,
+        team2_score: resultAttributes.team2Score,
+      })
+      .guard('web')
+      .loginAs(user)
 
     response.assertStatus(422)
   }).tags(['result', 'store_result'])
 
   test('should return 422 error if non-existing `match_id` is provided', async ({ client }) => {
     await MatchFactory.create()
+    const user = await UserFactory.create()
 
-    const response = await client.post('/results').json({
-      matchId: 5,
-      team1Score: faker.datatype.number({ min: 0, max: 9 }),
-      team2Score: faker.datatype.number({ min: 0, max: 9 }),
-    })
+    const resultAttributes = await ResultFactory.make()
+
+    const response = await client
+      .post('/results')
+      .json({
+        matchId: faker.random.numeric,
+        team1_score: resultAttributes.team1Score,
+        team2_score: resultAttributes.team2Score,
+      })
+      .guard('web')
+      .loginAs(user)
 
     response.assertStatus(422)
   }).tags(['result', 'store_result'])
 
   test('should create a new result', async ({ client }) => {
     const match = await MatchFactory.create()
+    const user = await UserFactory.create()
 
-    const response = await client.post('/results').json({
-      match_id: match.id,
-      team1_score: faker.datatype.number({ min: 0, max: 9 }),
-      team2_score: faker.datatype.number({ min: 0, max: 9 }),
-    })
+    const resultAttributes = await ResultFactory.make()
+    const response = await client
+      .post('/results')
+      .json({
+        match_id: match.id,
+        team1_score: resultAttributes.team1Score,
+        team2_score: resultAttributes.team2Score,
+      })
+      .guard('web')
+      .loginAs(user)
 
     const createdResult = response.body().data
 
@@ -75,11 +96,8 @@ test.group('Result', (group) => {
   }).tags(['result', 'get_results'])
 
   test('should return a result', async ({ client }) => {
-    const matches = await MatchFactory.with('result').createMany(10)
-    const results = matches.map((match) => match.result)
-
-    const resultIds = results.map((result) => result.id)
-    const resultId = faker.helpers.arrayElement(resultIds)
+    const match = await MatchFactory.with('result').create()
+    const resultId = match.result.id
 
     const response = await client.get(`/results/${resultId}`)
 
@@ -92,16 +110,19 @@ test.group('Result', (group) => {
   }).tags(['result', 'get_result'])
 
   test('should update a result', async ({ client }) => {
-    const matches = await MatchFactory.with('result').createMany(10)
-    const results = matches.map((match) => match.result)
+    const match = await MatchFactory.with('result').create()
+    const resultId = match.result.id
+    const user = await UserFactory.create()
 
-    const resultIds = results.map((result) => result.id)
-    const resultId = faker.helpers.arrayElement(resultIds)
-
-    const response = await client.patch(`/results/${resultId}`).json({
-      team1_score: faker.datatype.number({ min: 0, max: 9 }),
-      team2_score: faker.datatype.number({ min: 0, max: 9 }),
-    })
+    const resultAttributes = await ResultFactory.make()
+    const response = await client
+      .patch(`/results/${resultId}`)
+      .json({
+        team1_score: resultAttributes.team1Score,
+        team2_score: resultAttributes.team2Score,
+      })
+      .guard('web')
+      .loginAs(user)
 
     const updatedResult = response.body().data
 
@@ -113,13 +134,12 @@ test.group('Result', (group) => {
   }).tags(['result', 'update_result'])
 
   test('should delete a result', async ({ client, assert }) => {
-    const matches = await MatchFactory.with('result').createMany(10)
-    const results = matches.map((match) => match.result)
+    const match = await MatchFactory.with('result').create()
+    const resultId = match.result.id
 
-    const resultIds = results.map((result) => result.id)
-    const resultId = faker.helpers.arrayElement(resultIds)
+    const user = await UserFactory.create()
 
-    const response = await client.delete(`/results/${resultId}`)
+    const response = await client.delete(`/results/${resultId}`).guard('web').loginAs(user)
 
     const deletedResult = response.body().data
 
