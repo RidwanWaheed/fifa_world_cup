@@ -31,30 +31,36 @@ Route.get('health', async ({ response }) => {
   return report.healthy ? response.ok(report) : response.badRequest(report)
 })
 
-Route.post('/groups', 'GroupsController.store')
-Route.get('/groups', 'GroupsController.index')
-Route.get('groups/:id', 'GroupsController.show')
-Route.put('groups/:id', 'GroupsController.update')
-Route.delete('/groups/:id', 'GroupsController.destroy')
-
-Route.post('/teams', 'TeamsController.store')
-Route.get('/teams', 'TeamsController.index')
-Route.get('teams/:id', 'TeamsController.show')
-Route.put('teams/:id', 'TeamsController.update')
-Route.delete('/teams/:id', 'TeamsController.destroy')
-
-Route.post('/matches', 'MatchesController.store')
-Route.get('/matches', 'MatchesController.index')
-Route.get('matches/:id', 'MatchesController.show')
-Route.put('matches/:id', 'MatchesController.update')
-Route.delete('/matches/:id', 'MatchesController.destroy')
-
-Route.post('/results', 'ResultsController.store')
-Route.get('/results', 'ResultsController.index')
-Route.get('results/:id', 'ResultsController.show')
-Route.patch('results/:id', 'ResultsController.update')
-Route.delete('/results/:id', 'ResultsController.destroy')
-
 Route.post('register', 'AuthController.register')
 Route.post('login', 'AuthController.login')
 Route.get('logout', 'AuthController.logout')
+
+// Require all data inputs and modifications to be done by authenticated users
+Route.group(() => {
+  Route.post('/groups', 'GroupsController.store')
+  Route.put('groups/:id', 'GroupsController.update')
+  Route.delete('/groups/:id', 'GroupsController.destroy')
+
+  Route.post('/teams', 'TeamsController.store')
+  Route.put('teams/:id', 'TeamsController.update')
+  Route.delete('/teams/:id', 'TeamsController.destroy')
+
+  Route.post('/matches', 'MatchesController.store')
+  Route.put('matches/:id', 'MatchesController.update')
+  Route.delete('/matches/:id', 'MatchesController.destroy')
+
+  Route.post('/results', 'ResultsController.store')
+  Route.patch('results/:id', 'ResultsController.update')
+  Route.delete('/results/:id', 'ResultsController.destroy')
+}).middleware('auth:web')
+
+Route.get('groups/:id', 'GroupsController.show')
+Route.get('/groups', 'GroupsController.index')
+Route.get('/teams', 'TeamsController.index')
+Route.get('teams/:id', 'TeamsController.show')
+
+Route.get('/matches', 'MatchesController.index')
+Route.get('matches/:id', 'MatchesController.show')
+
+Route.get('/results', 'ResultsController.index')
+Route.get('results/:id', 'ResultsController.show')
