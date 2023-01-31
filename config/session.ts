@@ -88,6 +88,7 @@ export default sessionConfig({
     path: '/',
     httpOnly: true,
     sameSite: false,
+    domain: Env.get('FRONTEND_HOST'),
   },
 
   /*

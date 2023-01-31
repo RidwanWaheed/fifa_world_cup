@@ -1,7 +1,6 @@
-import Hash from '@ioc:Adonis/Core/Hash'
-import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import User from 'App/Models/User'
+import { schema, rules } from '@ioc:Adonis/Core/Validator'
+import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 
 export default class AuthController {
   public async register({ request, response, auth }: HttpContextContract) {
@@ -33,7 +32,7 @@ export default class AuthController {
 
     const user = await User.create({
       username,
-      email,
+      email: email.toLocaleLowerCase(),
       password,
     })
 
@@ -46,16 +45,8 @@ export default class AuthController {
     const { username, password } = request.only(['username', 'password'])
 
     try {
-      // Lookup user manually
-      const user = await User.query().where('username', username).firstOrFail()
-
-      // Verify password
-      if (!(await Hash.verify(user.password, password))) {
-        return response.badRequest('Invalid credentials')
-      }
-
       // Create session
-      await auth.use('web').login(user)
+      await auth.use('web').attempt(username, password)
     } catch (error) {
       return response.unauthorized({ message: 'Invalid credentials' })
     }

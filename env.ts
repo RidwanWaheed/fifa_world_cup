@@ -28,4 +28,6 @@ export default Env.rules({
   MYSQL_PASSWORD: Env.schema.string.optional(),
   MYSQL_DB_NAME: Env.schema.string(),
   SESSION_DRIVER: Env.schema.string(),
+  FRONTEND_HOST: Env.schema.string(),
+  FRONTEND_BASE_URL: Env.schema.string(),
 })
