@@ -59,7 +59,7 @@ export default class AuthController {
     } catch (error) {
       return response.unauthorized({ message: 'Invalid credentials' })
     }
-    response.ok({ message: 'Login successful' })
+    response.ok({ message: 'Login successful', auth: auth.isLoggedIn, username: username })
   }
 
   public async logout({ response, auth }: HttpContextContract) {

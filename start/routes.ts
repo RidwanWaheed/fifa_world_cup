@@ -52,6 +52,8 @@ Route.group(() => {
   Route.post('/results', 'ResultsController.store')
   Route.patch('results/:id', 'ResultsController.update')
   Route.delete('/results/:id', 'ResultsController.destroy')
+
+  Route.get('user', 'UsersController.show')
 }).middleware('auth:web')
 
 Route.get('groups/:id', 'GroupsController.show')
