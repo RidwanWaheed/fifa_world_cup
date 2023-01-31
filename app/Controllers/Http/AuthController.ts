@@ -5,12 +5,6 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 export default class AuthController {
   public async register({ request, response, auth }: HttpContextContract) {
     const userSchema = schema.create({
-      username: schema.string([
-        rules.trim(),
-        rules.escape(),
-        rules.maxLength(30),
-        rules.unique({ table: 'users', column: 'username', caseInsensitive: true }),
-      ]),
       email: schema.string([
         rules.trim(),
         rules.email(),
@@ -19,11 +13,9 @@ export default class AuthController {
       password: schema.string([rules.minLength(8), rules.trim()]),
     })
 
-    const { username, email, password } = await request.validate({
+    const { email, password } = await request.validate({
       schema: userSchema,
       messages: {
-        'username.required': 'The {{ field }} is required to create a new account',
-        'username.unique': 'Username not available',
         'email.required': 'The {{ field }} is required to create a new account',
         'email.unique': 'Email has already been used',
         'password.minLength': 'Password length must be greater than eight',
@@ -31,26 +23,23 @@ export default class AuthController {
     })
 
     const user = await User.create({
-      username,
       email: email.toLocaleLowerCase(),
       password,
     })
-
-    await auth.login(user)
 
     return response.created({ message: 'User has been Registered!', data: user })
   }
 
   public async login({ request, response, auth }: HttpContextContract) {
-    const { username, password } = request.only(['username', 'password'])
+    const { email, password } = request.only(['email', 'password'])
 
     try {
       // Create session
-      await auth.use('web').attempt(username, password)
+      await auth.use('web').attempt(email, password)
     } catch (error) {
       return response.unauthorized({ message: 'Invalid credentials' })
     }
-    response.ok({ message: 'Login successful', auth: auth.isLoggedIn, username: username })
+    response.ok({ message: 'Login successful', auth: auth.isLoggedIn, username: email })
   }
 
   public async logout({ response, auth }: HttpContextContract) {
