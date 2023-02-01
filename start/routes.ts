@@ -33,7 +33,6 @@ Route.get('health', async ({ response }) => {
 
 Route.post('register', 'AuthController.register')
 Route.post('login', 'AuthController.login')
-Route.get('logout', 'AuthController.logout')
 
 // Require all data inputs and modifications to be done by authenticated users
 Route.group(() => {
@@ -54,6 +53,8 @@ Route.group(() => {
   Route.delete('/results/:id', 'ResultsController.destroy')
 
   Route.get('user', 'UsersController.show')
+
+  Route.post('logout', 'AuthController.logout')
 }).middleware('auth:web')
 
 Route.get('groups/:id', 'GroupsController.show')

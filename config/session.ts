@@ -89,6 +89,7 @@ export default sessionConfig({
     httpOnly: true,
     sameSite: 'none',
     domain: Env.get('FRONTEND_HOST'),
+    secure: true,
   },
 
   /*
