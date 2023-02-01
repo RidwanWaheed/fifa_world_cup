@@ -3,7 +3,7 @@ import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 
 export default class AuthController {
-  public async register({ request, response, auth }: HttpContextContract) {
+  public async register({ request, response }: HttpContextContract) {
     const userSchema = schema.create({
       email: schema.string([
         rules.trim(),
